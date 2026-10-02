@@ -1,6 +1,14 @@
 @Bookify_HostAddress = http://localhost:5067
 
-GET {{Bookify_HostAddress}}/weatherforecast/
+GET {{Bookify_HostAddress}}/api/resources
 Accept: application/json
 
 ###
+
+GET {{Bookify_HostAddress}}/api/customers
+Accept: application/json
+
+###
+
+GET {{Bookify_HostAddress}}/api/bookings
+Accept: application/json

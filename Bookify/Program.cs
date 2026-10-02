@@ -11,6 +11,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddCors(options =>
+{
+	options.AddPolicy("ReactFrontend", policy =>
+	{
+		policy.WithOrigins("http://localhost:5173", "http://localhost:3000")
+			.AllowAnyHeader()
+			.AllowAnyMethod();
+	});
+});
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -40,7 +49,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-
+app.UseCors("ReactFrontend");
 
 app.UseAuthorization();
 

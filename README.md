@@ -11,7 +11,7 @@ Right now I am organizing the project structure and building it step by step.
 ## Project structure
 
 ```text
-Bookify/
+Bookify.Api/
 ├── Domain/
 ├── Application/
 ├── Infrastructure/

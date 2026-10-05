@@ -32,6 +32,24 @@
   background: #e6a25a;
 }
 
+.topbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-left: auto;
+  margin-right: 32px;
+}
+
+.topbar-nav a {
+  color: #d3dfd8;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.topbar-nav a:hover {
+  color: #fff;
+}
+
 .workspace-label {
   color: #d3dfd8;
   font-size: 13px;
@@ -92,6 +110,10 @@
 
 .resource-section {
   padding-top: 28px;
+}
+
+.booking-section {
+  padding-top: 42px;
 }
 
 .section-heading {
@@ -221,6 +243,67 @@
   cursor: pointer;
 }
 
+.booking-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #dfe4df;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.booking-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.booking-table th,
+.booking-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #edf0ed;
+  font-size: 13px;
+}
+
+.booking-table th {
+  color: #68736c;
+  background: #f8faf8;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.booking-table td {
+  color: #43584d;
+}
+
+.booking-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.booking-resource {
+  color: #20352f !important;
+  font-weight: 650;
+}
+
+.booking-status {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 3px;
+  color: #4e5d52;
+  background: #edf0ed;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.status-confirmed {
+  color: #286047;
+  background: #e5f1e9;
+}
+
+.status-cancelled {
+  color: #8b4938;
+  background: #f6e8e3;
+}
+
 @media (max-width: 600px) {
   .topbar {
     height: 58px;
@@ -234,6 +317,15 @@
 
   .page-heading h1 {
     font-size: 32px;
+  }
+
+  .topbar-nav {
+    gap: 12px;
+    margin-right: 0;
+  }
+
+  .workspace-label {
+    display: none;
   }
 
   .error-message {

@@ -116,11 +116,214 @@
   padding-top: 42px;
 }
 
+.booking-create-heading {
+  margin-bottom: 16px;
+}
+
+.booking-create-heading h2 {
+  margin: 0;
+  color: #20352f;
+  font-size: 16px;
+  font-weight: 650;
+}
+
+.booking-create-heading p {
+  margin: 8px 0 0;
+  color: #68736c;
+  font-size: 14px;
+}
+
+.booking-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid #dfe4df;
+  border-radius: 4px;
+  background: #fff;
+  margin-bottom: 34px;
+}
+
+.booking-form label {
+  display: grid;
+  gap: 7px;
+  color: #43584d;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.booking-form input,
+.booking-form select {
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  padding: 0 10px;
+  border: 1px solid #cfd8d0;
+  border-radius: 3px;
+  color: #263a32;
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+}
+
+.booking-form input:focus,
+.booking-form select:focus {
+  border-color: #617c6c;
+  outline: 2px solid #d9e5da;
+  outline-offset: 1px;
+}
+
+.booking-form-footer {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 40px;
+  padding-top: 4px;
+}
+
+.form-message {
+  margin: 12px 0;
+  color: #68736c;
+  font-size: 13px;
+}
+
+.booking-form-footer .form-message {
+  margin: 0;
+}
+
+.error-text {
+  color: #8b4938;
+}
+
+.success-text {
+  color: #286047;
+}
+
+.create-button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 3px;
+  color: #fff;
+  background: #a45137;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.create-button:hover:not(:disabled) {
+  background: #893f2c;
+}
+
+.create-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
 .section-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 18px;
+}
+
+.resource-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.add-resource-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 11px;
+  border: 1px solid #cfd8d0;
+  border-radius: 4px;
+  color: #354d43;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.add-resource-button:hover {
+  background: #edf2ed;
+}
+
+.resource-form {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 120px auto;
+  align-items: end;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding: 18px;
+  border: 1px solid #dfe4df;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.resource-form label {
+  display: grid;
+  gap: 7px;
+  color: #43584d;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.resource-form label > input:not([type='checkbox']) {
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  padding: 0 10px;
+  border: 1px solid #cfd8d0;
+  border-radius: 3px;
+  color: #263a32;
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+}
+
+.resource-form input:focus {
+  border-color: #617c6c;
+  outline: 2px solid #d9e5da;
+  outline-offset: 1px;
+}
+
+.resource-form .availability-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  white-space: nowrap;
+}
+
+.availability-field input {
+  width: 16px;
+  height: 16px;
+  accent-color: #286047;
+}
+
+.resource-form-footer {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 40px;
+}
+
+.resource-form-footer .form-message {
+  margin: 0;
 }
 
 .section-heading h2 {
@@ -331,5 +534,29 @@
   .error-message {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .booking-form {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+  .resource-form {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+  .resource-form-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .booking-form-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .create-button {
+    width: 100%;
   }
 }

@@ -112,6 +112,10 @@
   padding-top: 28px;
 }
 
+.customer-section {
+  padding-top: 42px;
+}
+
 .booking-section {
   padding-top: 42px;
 }
@@ -323,6 +327,63 @@
 }
 
 .resource-form-footer .form-message {
+  margin: 0;
+}
+
+.customer-form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding: 18px;
+  border: 1px solid #dfe4df;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.customer-form label {
+  display: grid;
+  gap: 7px;
+  color: #43584d;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.customer-form input {
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  padding: 0 10px;
+  border: 1px solid #cfd8d0;
+  border-radius: 3px;
+  color: #263a32;
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+}
+
+.customer-form input:focus {
+  border-color: #617c6c;
+  outline: 2px solid #d9e5da;
+  outline-offset: 1px;
+}
+
+.optional-label {
+  color: #68736c;
+  font-weight: 400;
+}
+
+.customer-form-footer {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 40px;
+}
+
+.customer-form-footer .form-message {
   margin: 0;
 }
 
@@ -546,7 +607,17 @@
     padding: 16px;
   }
 
+  .customer-form {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
   .resource-form-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .customer-form-footer {
     align-items: stretch;
     flex-direction: column;
   }

@@ -24,6 +24,13 @@ type Customer = {
   id: number
   name: string
   email: string
+  phone: string
+}
+
+type CreateCustomerForm = {
+  name: string
+  email: string
+  phone: string
 }
 
 const formatDate = (value: string) =>
@@ -52,7 +59,18 @@ function App() {
   const [bookingsError, setBookingsError] = useState('')
   const [bookingsReload, setBookingsReload] = useState(0)
   const [customers, setCustomers] = useState<Customer[]>([])
+  const [areCustomersLoading, setAreCustomersLoading] = useState(true)
   const [customersError, setCustomersError] = useState('')
+  const [customersReload, setCustomersReload] = useState(0)
+  const [isCustomerFormOpen, setIsCustomerFormOpen] = useState(false)
+  const [customerForm, setCustomerForm] = useState<CreateCustomerForm>({
+    name: '',
+    email: '',
+    phone: '',
+  })
+  const [isCreatingCustomer, setIsCreatingCustomer] = useState(false)
+  const [customerFormError, setCustomerFormError] = useState('')
+  const [customerFormSuccess, setCustomerFormSuccess] = useState('')
   const [bookingForm, setBookingForm] = useState({
     customerId: '',
     resourceId: '',
@@ -103,6 +121,7 @@ function App() {
     const controller = new AbortController()
 
     async function loadCustomers() {
+      setAreCustomersLoading(true)
       setCustomersError('')
 
       try {
@@ -123,12 +142,16 @@ function App() {
               : 'Unable to load customers.',
           )
         }
+      } finally {
+        if (!controller.signal.aborted) {
+          setAreCustomersLoading(false)
+        }
       }
     }
 
     void loadCustomers()
     return () => controller.abort()
-  }, [])
+  }, [customersReload])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -165,6 +188,51 @@ function App() {
     void loadBookings()
     return () => controller.abort()
   }, [bookingsReload])
+
+  async function handleCreateCustomer(event: SubmitEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setCustomerFormError('')
+    setCustomerFormSuccess('')
+
+    if (!customerForm.name.trim()) {
+      setCustomerFormError('Enter a customer name.')
+      return
+    }
+
+    setIsCreatingCustomer(true)
+
+    try {
+      const response = await fetch('http://localhost:5067/api/customers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: customerForm.name.trim(),
+          email: customerForm.email.trim(),
+          phone: customerForm.phone.trim(),
+        }),
+      })
+
+      if (!response.ok) {
+        const responseBody = await response.text()
+        throw new Error(responseBody || `Request failed (${response.status})`)
+      }
+
+      const customer = (await response.json()) as Customer
+      setCustomers((current) => [...current, customer])
+      setBookingForm((current) => ({ ...current, customerId: String(customer.id) }))
+      setCustomerForm({ name: '', email: '', phone: '' })
+      setIsCustomerFormOpen(false)
+      setCustomerFormSuccess(`${customer.name} added and selected for the new booking.`)
+    } catch (submitError) {
+      setCustomerFormError(
+        submitError instanceof Error
+          ? submitError.message
+          : 'Unable to add customer.',
+      )
+    } finally {
+      setIsCreatingCustomer(false)
+    }
+  }
 
   async function handleCreateResource(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -283,6 +351,7 @@ function App() {
         </a>
         <nav className="topbar-nav" aria-label="Main navigation">
           <a href="#resources">Resources</a>
+          <a href="#customers">Customers</a>
           <a href="#bookings">Bookings</a>
         </nav>
         <span className="workspace-label">Booking workspace</span>
@@ -432,6 +501,123 @@ function App() {
                   </div>
                 </article>
               ))}
+            </div>
+          )}
+        </section>
+
+        <section id="customers" className="customer-section" aria-labelledby="customer-list-title">
+          <div className="section-heading">
+            <div>
+              <h2 id="customer-list-title">Customers</h2>
+              <p>People who can book your resources</p>
+            </div>
+            <button
+              className="add-resource-button"
+              type="button"
+              onClick={() => {
+                setIsCustomerFormOpen((open) => !open)
+                setCustomerFormError('')
+                setCustomerFormSuccess('')
+              }}
+              aria-expanded={isCustomerFormOpen}
+              aria-controls="customer-create-form"
+            >
+              <Plus size={16} />
+              Add customer
+            </button>
+          </div>
+
+          {customerFormSuccess && (
+            <p className="form-message success-text" role="status">{customerFormSuccess}</p>
+          )}
+
+          {isCustomerFormOpen && (
+            <form
+              id="customer-create-form"
+              className="customer-form"
+              onSubmit={handleCreateCustomer}
+            >
+              <label>
+                Name
+                <input
+                  required
+                  maxLength={200}
+                  autoComplete="name"
+                  value={customerForm.name}
+                  onChange={(event) =>
+                    setCustomerForm((current) => ({ ...current, name: event.target.value }))
+                  }
+                  placeholder="e.g. Alex Morgan"
+                />
+              </label>
+              <label>
+                Email
+                <input
+                  required
+                  type="email"
+                  maxLength={320}
+                  autoComplete="email"
+                  value={customerForm.email}
+                  onChange={(event) =>
+                    setCustomerForm((current) => ({ ...current, email: event.target.value }))
+                  }
+                  placeholder="alex@example.com"
+                />
+              </label>
+              <label>
+                Phone <span className="optional-label">(optional)</span>
+                <input
+                  type="tel"
+                  maxLength={50}
+                  autoComplete="tel"
+                  value={customerForm.phone}
+                  onChange={(event) =>
+                    setCustomerForm((current) => ({ ...current, phone: event.target.value }))
+                  }
+                  placeholder="Phone number"
+                />
+              </label>
+              <div className="customer-form-footer">
+                <p className="form-message error-text" role="alert">{customerFormError}</p>
+                <button className="create-button" type="submit" disabled={isCreatingCustomer}>
+                  <Plus size={16} />
+                  {isCreatingCustomer ? 'Adding...' : 'Save customer'}
+                </button>
+              </div>
+            </form>
+          )}
+
+          {areCustomersLoading ? (
+            <p className="message" role="status">Loading customers...</p>
+          ) : customersError ? (
+            <div className="message error-message" role="alert">
+              <span>{customersError}</span>
+              <button type="button" onClick={() => setCustomersReload((value) => value + 1)}>
+                Try again
+              </button>
+            </div>
+          ) : customers.length === 0 ? (
+            <p className="message">No customers have been added yet.</p>
+          ) : (
+            <div className="booking-table-wrap">
+              <table className="booking-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Phone</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {customers.map((customer) => (
+                    <tr key={customer.id}>
+                      <td className="booking-resource">{customer.name}</td>
+                      <td>{customer.email}</td>
+                      <td>{customer.phone || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </section>

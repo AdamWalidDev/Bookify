@@ -33,6 +33,13 @@ type CreateCustomerForm = {
   phone: string
 }
 
+type Page = 'resources' | 'customers' | 'bookings'
+
+const getPageFromHash = (): Page => {
+  const page = window.location.hash.slice(1)
+  return page === 'customers' || page === 'bookings' ? page : 'resources'
+}
+
 const formatDate = (value: string) =>
   new Intl.DateTimeFormat(undefined, {
     dateStyle: 'medium',
@@ -40,6 +47,7 @@ const formatDate = (value: string) =>
   }).format(new Date(value))
 
 function App() {
+  const [activePage, setActivePage] = useState<Page>(getPageFromHash)
   const [resources, setResources] = useState<Resource[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
@@ -80,6 +88,12 @@ function App() {
   const [isCreatingBooking, setIsCreatingBooking] = useState(false)
   const [createBookingError, setCreateBookingError] = useState('')
   const [createBookingSuccess, setCreateBookingSuccess] = useState('')
+
+  useEffect(() => {
+    const handleHashChange = () => setActivePage(getPageFromHash())
+    window.addEventListener('hashchange', handleHashChange)
+    return () => window.removeEventListener('hashchange', handleHashChange)
+  }, [])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -350,9 +364,9 @@ function App() {
           <span>Bookify</span>
         </a>
         <nav className="topbar-nav" aria-label="Main navigation">
-          <a href="#resources">Resources</a>
-          <a href="#customers">Customers</a>
-          <a href="#bookings">Bookings</a>
+          <a href="#resources" aria-current={activePage === 'resources' ? 'page' : undefined}>Resources</a>
+          <a href="#customers" aria-current={activePage === 'customers' ? 'page' : undefined}>Customers</a>
+          <a href="#bookings" aria-current={activePage === 'bookings' ? 'page' : undefined}>Bookings</a>
         </nav>
         <span className="workspace-label">Booking workspace</span>
       </header>
@@ -360,16 +374,29 @@ function App() {
       <main className="main-content">
         <section className="page-heading">
           <div>
-            <p className="eyebrow">DIRECTORY</p>
-            <h1>Resources</h1>
-            <p className="page-description">Rooms and spaces available for booking.</p>
+            <p className="eyebrow">
+              {activePage === 'resources' ? 'DIRECTORY' : activePage === 'customers' ? 'PEOPLE' : 'SCHEDULE'}
+            </p>
+            <h1>
+              {activePage === 'resources' ? 'Resources' : activePage === 'customers' ? 'Customers' : 'Bookings'}
+            </h1>
+            <p className="page-description">
+              {activePage === 'resources'
+                ? 'Rooms and spaces available for booking.'
+                : activePage === 'customers'
+                  ? 'Manage the people who book your resources.'
+                  : 'Create and review scheduled resource bookings.'}
+            </p>
           </div>
-          <div className="resource-count">
-            <strong>{resources.length}</strong>
-            <span>listed</span>
-          </div>
+          {activePage === 'resources' && (
+            <div className="resource-count">
+              <strong>{resources.length}</strong>
+              <span>listed</span>
+            </div>
+          )}
         </section>
 
+        {activePage === 'resources' && (
         <section id="resources" className="resource-section" aria-labelledby="resource-list-title">
           <div className="section-heading">
             <div>
@@ -504,7 +531,9 @@ function App() {
             </div>
           )}
         </section>
+        )}
 
+        {activePage === 'customers' && (
         <section id="customers" className="customer-section" aria-labelledby="customer-list-title">
           <div className="section-heading">
             <div>
@@ -621,7 +650,9 @@ function App() {
             </div>
           )}
         </section>
+        )}
 
+        {activePage === 'bookings' && (
         <section id="bookings" className="booking-section" aria-labelledby="booking-list-title">
           <div className="booking-create-heading">
             <div>
@@ -775,6 +806,7 @@ function App() {
             </div>
           )}
         </section>
+        )}
       </main>
     </div>
   )

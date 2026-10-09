@@ -50,6 +50,14 @@
   color: #fff;
 }
 
+.topbar-nav a[aria-current='page'] {
+  color: #fff;
+  text-decoration: underline;
+  text-decoration-color: #e6a25a;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 7px;
+}
+
 .workspace-label {
   color: #d3dfd8;
   font-size: 13px;

@@ -1,9 +1,11 @@
 using Bookify.Application.DTOs;
 using Bookify.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bookify.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class CustomersController : ControllerBase
@@ -87,6 +89,10 @@ public class CustomersController : ControllerBase
 		catch (KeyNotFoundException)
 		{
 			return NotFound();
+		}
+		catch (InvalidOperationException ex)
+		{
+			return Conflict(ex.Message);
 		}
 	}
 }

@@ -23,6 +23,9 @@ Bookify.Api/
 - Edit booking dates, confirm, cancel, complete, and delete bookings.
 - Unavailable resources cannot be booked.
 - Pending and confirmed bookings reserve their time slots. Cancelled and completed bookings do not.
+- Login with a JWT token. All `/api/customers`, `/api/resources` and `/api/bookings` endpoints need it.
+- Input is validated (required fields, email format, length limits, capacity).
+- A customer or resource that has bookings cannot be deleted (the API returns 409).
 
 ## Requirements
 
@@ -36,7 +39,32 @@ Bookify.Api/
 2. Restore and run the API: `dotnet run --project Bookify.Api`.
 3. On startup, the API applies any pending EF Core migrations and creates the database if needed.
 4. In another terminal, start the frontend: `npm --prefix Bookify.Frontend run dev`.
-5. Open the frontend URL printed by Vite.
+5. Open the frontend URL printed by Vite (`http://localhost:5173`).
+6. Sign in with the development account `admin` / `admin123` (set in `appsettings.Development.json`).
+
+## Configuration
+
+| Setting | Where | Notes |
+|---|---|---|
+| `ConnectionStrings:DefaultConnection` | API | SQL Server connection string |
+| `Jwt:Key` | API | Secret for signing tokens, at least 32 characters |
+| `Jwt:Issuer` | API | Token issuer, default `Bookify` |
+| `Admin:Username`, `Admin:Password` | API | The login account |
+| `Cors:AllowedOrigins` | API | Frontend URLs that may call the API |
+| `VITE_API_URL` | Frontend | API URL, default `http://localhost:5067` (see `.env.example`) |
+
+The development values in `appsettings.Development.json` are only for local use. In production, set the settings with environment variables instead, for example `Jwt__Key`, `Admin__Password` and `Cors__AllowedOrigins__0`.
+
+## Docker
+
+Build and run the API image (it needs a SQL Server and the settings above):
+
+```powershell
+docker build -t bookify-api .
+docker run -p 8080:8080 -e ConnectionStrings__DefaultConnection="..." -e Jwt__Key="..." -e Admin__Username="..." -e Admin__Password="..." -e Cors__AllowedOrigins__0="http://localhost:5173" bookify-api
+```
+
+GitHub Actions (`.github/workflows/ci.yml`) runs the API tests and the frontend lint and build on every push and pull request.
 
 If you already have a database created by an earlier version that used `EnsureCreated`, it does not have EF migration history. Back up and migrate that database before running this version; startup migrations do not automatically adopt it.
 

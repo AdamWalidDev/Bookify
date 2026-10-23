@@ -8,10 +8,12 @@ namespace Bookify.Application.Services;
 public class ResourceService : IResourceService
 {
 	private readonly IResourceRepository _resourceRepository;
+	private readonly IBookingRepository _bookingRepository;
 
-	public ResourceService(IResourceRepository resourceRepository)
+	public ResourceService(IResourceRepository resourceRepository, IBookingRepository bookingRepository)
 	{
 		_resourceRepository = resourceRepository;
+		_bookingRepository = bookingRepository;
 	}
 
 	public async Task<ResourceDto?> GetByIdAsync(int id)
@@ -69,6 +71,11 @@ public class ResourceService : IResourceService
 		if (!await _resourceRepository.ExistsAsync(id))
 		{
 			throw new KeyNotFoundException("Resource not found.");
+		}
+
+		if ((await _bookingRepository.GetByResourceIdAsync(id)).Any())
+		{
+			throw new InvalidOperationException("Resource has bookings and cannot be deleted.");
 		}
 
 		await _resourceRepository.DeleteAsync(id);

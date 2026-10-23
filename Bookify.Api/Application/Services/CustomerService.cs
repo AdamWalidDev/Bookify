@@ -8,10 +8,12 @@ namespace Bookify.Application.Services;
 public class CustomerService : ICustomerService
 {
 	private readonly ICustomerRepository _customerRepository;
+	private readonly IBookingRepository _bookingRepository;
 
-	public CustomerService(ICustomerRepository customerRepository)
+	public CustomerService(ICustomerRepository customerRepository, IBookingRepository bookingRepository)
 	{
 		_customerRepository = customerRepository;
+		_bookingRepository = bookingRepository;
 	}
 
 	public async Task<CustomerDto?> GetByIdAsync(int id)
@@ -80,6 +82,11 @@ public class CustomerService : ICustomerService
 		if (!await _customerRepository.ExistsAsync(id))
 		{
 			throw new KeyNotFoundException("Customer not found.");
+		}
+
+		if ((await _bookingRepository.GetByCustomerIdAsync(id)).Any())
+		{
+			throw new InvalidOperationException("Customer has bookings and cannot be deleted.");
 		}
 
 		await _customerRepository.DeleteAsync(id);

@@ -87,7 +87,7 @@ public class BookingAvailabilityTests
 	public async Task CustomerService_RejectsDuplicateEmail()
 	{
 		await using var fixture = await BookingFixture.CreateAsync();
-		var service = new CustomerService(new CustomerRepository(fixture.Context));
+		var service = new CustomerService(new CustomerRepository(fixture.Context), new BookingRepository(fixture.Context));
 
 		var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
 			service.CreateAsync(new CreateCustomerDto
@@ -97,6 +97,26 @@ public class BookingAvailabilityTests
 			}));
 
 		Assert.Contains("email", exception.Message, StringComparison.OrdinalIgnoreCase);
+	}
+
+	[Fact]
+	public async Task CustomerService_RejectsDeletingCustomerWithBookings()
+	{
+		await using var fixture = await BookingFixture.CreateAsync();
+		await fixture.AddBookingAsync(BookingStatus.Confirmed);
+		var service = new CustomerService(new CustomerRepository(fixture.Context), new BookingRepository(fixture.Context));
+
+		await Assert.ThrowsAsync<InvalidOperationException>(() => service.DeleteAsync(fixture.Customer.Id));
+	}
+
+	[Fact]
+	public async Task ResourceService_RejectsDeletingResourceWithBookings()
+	{
+		await using var fixture = await BookingFixture.CreateAsync();
+		await fixture.AddBookingAsync(BookingStatus.Cancelled);
+		var service = new ResourceService(new ResourceRepository(fixture.Context), new BookingRepository(fixture.Context));
+
+		await Assert.ThrowsAsync<InvalidOperationException>(() => service.DeleteAsync(fixture.Resource.Id));
 	}
 
 	[Fact]

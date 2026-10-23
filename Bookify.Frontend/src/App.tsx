@@ -1,6 +1,7 @@
 import { useEffect, useState, type SubmitEvent } from 'react'
 import { Building2, Check, Pencil, Plus, RefreshCw, Trash2, UsersRound, X } from 'lucide-react'
 import './App.css'
+import { apiFetch } from './api'
 
 type Resource = {
   id: number
@@ -67,7 +68,11 @@ const getResponseMessage = async (response: Response) => {
   }
 }
 
-function App() {
+type AppProps = {
+  onLogout: () => void
+}
+
+function App({ onLogout }: AppProps) {
   const [activePage, setActivePage] = useState<Page>(getPageFromHash)
   const [resources, setResources] = useState<Resource[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -132,7 +137,7 @@ function App() {
       setError('')
 
       try {
-        const response = await fetch('http://localhost:5067/api/resources', {
+        const response = await apiFetch('/api/resources', {
           signal: controller.signal,
         })
 
@@ -168,7 +173,7 @@ function App() {
       setCustomersError('')
 
       try {
-        const response = await fetch('http://localhost:5067/api/customers', {
+        const response = await apiFetch('/api/customers', {
           signal: controller.signal,
         })
 
@@ -204,7 +209,7 @@ function App() {
       setBookingsError('')
 
       try {
-        const response = await fetch('http://localhost:5067/api/bookings', {
+        const response = await apiFetch('/api/bookings', {
           signal: controller.signal,
         })
 
@@ -245,7 +250,7 @@ function App() {
     setIsCreatingCustomer(true)
 
     try {
-      const response = await fetch('http://localhost:5067/api/customers', {
+      const response = await apiFetch('/api/customers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -290,7 +295,7 @@ function App() {
     setIsCreatingResource(true)
 
     try {
-      const response = await fetch('http://localhost:5067/api/resources', {
+      const response = await apiFetch('/api/resources', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -339,7 +344,7 @@ function App() {
     setIsCreatingBooking(true)
 
     try {
-      const response = await fetch('http://localhost:5067/api/bookings', {
+      const response = await apiFetch('/api/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -401,7 +406,7 @@ function App() {
     setBookingActionInProgress(true)
 
     try {
-      const response = await fetch(`http://localhost:5067/api/bookings/${booking.id}`, {
+      const response = await apiFetch(`/api/bookings/${booking.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -433,7 +438,7 @@ function App() {
     setBookingActionInProgress(true)
 
     try {
-      const response = await fetch(`http://localhost:5067/api/bookings/${editingBooking.id}`, {
+      const response = await apiFetch(`/api/bookings/${editingBooking.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -465,7 +470,7 @@ function App() {
     setBookingActionInProgress(true)
 
     try {
-      const response = await fetch(`http://localhost:5067/api/bookings/${booking.id}`, {
+      const response = await apiFetch(`/api/bookings/${booking.id}`, {
         method: 'DELETE',
       })
 
@@ -496,6 +501,7 @@ function App() {
           <a href="#bookings" aria-current={activePage === 'bookings' ? 'page' : undefined}>Bookings</a>
         </nav>
         <span className="workspace-label">Booking workspace</span>
+        <button type="button" className="table-action" onClick={onLogout}>Sign out</button>
       </header>
 
       <main className="main-content">

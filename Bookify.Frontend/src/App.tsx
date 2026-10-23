@@ -1,5 +1,5 @@
 import { useEffect, useState, type SubmitEvent } from 'react'
-import { Building2, Plus, RefreshCw, UsersRound } from 'lucide-react'
+import { Building2, Check, Pencil, Plus, RefreshCw, Trash2, UsersRound, X } from 'lucide-react'
 import './App.css'
 
 type Resource = {
@@ -12,6 +12,7 @@ type Resource = {
 
 type Booking = {
   id: number
+  customerId: number
   customerName: string
   resourceId: number
   resourceName: string
@@ -19,6 +20,8 @@ type Booking = {
   endDate: string
   status: string
 }
+
+type BookingStatus = 'Pending' | 'Confirmed' | 'Cancelled' | 'Completed'
 
 type Customer = {
   id: number
@@ -45,6 +48,24 @@ const formatDate = (value: string) =>
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(new Date(value))
+
+const toDateTimeLocal = (value: string) => {
+  const date = new Date(value)
+  const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60_000)
+  return localDate.toISOString().slice(0, 16)
+}
+
+const getResponseMessage = async (response: Response) => {
+  const body = await response.text()
+  if (!body) return `Request failed (${response.status})`
+
+  try {
+    const problem = JSON.parse(body) as { detail?: string; title?: string }
+    return problem.detail ?? problem.title ?? body
+  } catch {
+    return body
+  }
+}
 
 function App() {
   const [activePage, setActivePage] = useState<Page>(getPageFromHash)
@@ -88,6 +109,14 @@ function App() {
   const [isCreatingBooking, setIsCreatingBooking] = useState(false)
   const [createBookingError, setCreateBookingError] = useState('')
   const [createBookingSuccess, setCreateBookingSuccess] = useState('')
+  const [editingBooking, setEditingBooking] = useState<Booking | null>(null)
+  const [editBookingForm, setEditBookingForm] = useState({
+    startDate: '',
+    endDate: '',
+  })
+  const [bookingActionError, setBookingActionError] = useState('')
+  const [bookingActionSuccess, setBookingActionSuccess] = useState('')
+  const [bookingActionInProgress, setBookingActionInProgress] = useState(false)
 
   useEffect(() => {
     const handleHashChange = () => setActivePage(getPageFromHash())
@@ -353,6 +382,104 @@ function App() {
       )
     } finally {
       setIsCreatingBooking(false)
+    }
+  }
+
+  function startEditingBooking(booking: Booking) {
+    setEditingBooking(booking)
+    setEditBookingForm({
+      startDate: toDateTimeLocal(booking.startDate),
+      endDate: toDateTimeLocal(booking.endDate),
+    })
+    setBookingActionError('')
+    setBookingActionSuccess('')
+  }
+
+  async function updateBookingStatus(booking: Booking, status: BookingStatus) {
+    setBookingActionError('')
+    setBookingActionSuccess('')
+    setBookingActionInProgress(true)
+
+    try {
+      const response = await fetch(`http://localhost:5067/api/bookings/${booking.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          startDate: booking.startDate,
+          endDate: booking.endDate,
+          status,
+        }),
+      })
+
+      if (!response.ok) throw new Error(await getResponseMessage(response))
+
+      setBookingActionSuccess(`Booking #${booking.id} ${status.toLowerCase()}.`)
+      setBookingsReload((value) => value + 1)
+    } catch (actionError) {
+      setBookingActionError(
+        actionError instanceof Error ? actionError.message : 'Unable to update booking.',
+      )
+    } finally {
+      setBookingActionInProgress(false)
+    }
+  }
+
+  async function handleUpdateBooking(event: SubmitEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!editingBooking) return
+
+    setBookingActionError('')
+    setBookingActionSuccess('')
+    setBookingActionInProgress(true)
+
+    try {
+      const response = await fetch(`http://localhost:5067/api/bookings/${editingBooking.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          startDate: editBookingForm.startDate,
+          endDate: editBookingForm.endDate,
+          status: editingBooking.status,
+        }),
+      })
+
+      if (!response.ok) throw new Error(await getResponseMessage(response))
+
+      setEditingBooking(null)
+      setBookingActionSuccess(`Booking #${editingBooking.id} updated.`)
+      setBookingsReload((value) => value + 1)
+    } catch (actionError) {
+      setBookingActionError(
+        actionError instanceof Error ? actionError.message : 'Unable to update booking.',
+      )
+    } finally {
+      setBookingActionInProgress(false)
+    }
+  }
+
+  async function handleDeleteBooking(booking: Booking) {
+    if (!window.confirm(`Delete booking #${booking.id}? This cannot be undone.`)) return
+
+    setBookingActionError('')
+    setBookingActionSuccess('')
+    setBookingActionInProgress(true)
+
+    try {
+      const response = await fetch(`http://localhost:5067/api/bookings/${booking.id}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) throw new Error(await getResponseMessage(response))
+
+      if (editingBooking?.id === booking.id) setEditingBooking(null)
+      setBookingActionSuccess(`Booking #${booking.id} deleted.`)
+      setBookingsReload((value) => value + 1)
+    } catch (actionError) {
+      setBookingActionError(
+        actionError instanceof Error ? actionError.message : 'Unable to delete booking.',
+      )
+    } finally {
+      setBookingActionInProgress(false)
     }
   }
 
@@ -663,9 +790,9 @@ function App() {
 
           {customersError ? (
             <p className="form-message error-text" role="alert">{customersError}</p>
-          ) : resources.length === 0 || customers.length === 0 ? (
+          ) : resources.filter((resource) => resource.isAvailable).length === 0 || customers.length === 0 ? (
             <p className="form-message">
-              Add a customer and a resource before creating a booking.
+              Add a customer and at least one available resource before creating a booking.
             </p>
           ) : (
             <form className="booking-form" onSubmit={handleCreateBooking}>
@@ -697,7 +824,7 @@ function App() {
                   }
                 >
                   <option value="">Choose a resource</option>
-                  {resources.map((resource) => (
+                  {resources.filter((resource) => resource.isAvailable).map((resource) => (
                     <option key={resource.id} value={resource.id}>
                       {resource.name} (up to {resource.capacity})
                     </option>
@@ -764,6 +891,62 @@ function App() {
             </button>
           </div>
 
+          {bookingActionError && (
+            <p className="form-message error-text" role="alert">{bookingActionError}</p>
+          )}
+          {bookingActionSuccess && (
+            <p className="form-message success-text" role="status">{bookingActionSuccess}</p>
+          )}
+
+          {editingBooking && (
+            <form className="booking-form booking-edit-form" onSubmit={handleUpdateBooking}>
+              <div className="booking-create-heading booking-edit-heading">
+                <div>
+                  <h2>Edit booking #{editingBooking.id}</h2>
+                  <p>{editingBooking.resourceName} for {editingBooking.customerName}</p>
+                </div>
+                <button
+                  className="icon-button"
+                  type="button"
+                  aria-label="Close booking editor"
+                  onClick={() => setEditingBooking(null)}
+                >
+                  <X size={17} />
+                </button>
+              </div>
+              <label>
+                Starts
+                <input
+                  required
+                  type="datetime-local"
+                  value={editBookingForm.startDate}
+                  onChange={(event) =>
+                    setEditBookingForm((current) => ({ ...current, startDate: event.target.value }))
+                  }
+                />
+              </label>
+              <label>
+                Ends
+                <input
+                  required
+                  type="datetime-local"
+                  min={editBookingForm.startDate || undefined}
+                  value={editBookingForm.endDate}
+                  onChange={(event) =>
+                    setEditBookingForm((current) => ({ ...current, endDate: event.target.value }))
+                  }
+                />
+              </label>
+              <div className="booking-form-footer">
+                <span className="form-message">Status: {editingBooking.status}</span>
+                <button className="create-button" type="submit" disabled={bookingActionInProgress}>
+                  <Check size={16} />
+                  {bookingActionInProgress ? 'Saving...' : 'Save changes'}
+                </button>
+              </div>
+            </form>
+          )}
+
           {areBookingsLoading ? (
             <p className="message" role="status">Loading bookings...</p>
           ) : bookingsError ? (
@@ -785,6 +968,7 @@ function App() {
                     <th scope="col">Starts</th>
                     <th scope="col">Ends</th>
                     <th scope="col">Status</th>
+                    <th scope="col">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -798,6 +982,58 @@ function App() {
                         <span className={`booking-status status-${booking.status.toLowerCase()}`}>
                           {booking.status}
                         </span>
+                      </td>
+                      <td className="booking-actions">
+                        {(booking.status === 'Pending' || booking.status === 'Confirmed') && (
+                          <button
+                            className="table-action"
+                            type="button"
+                            onClick={() => startEditingBooking(booking)}
+                            aria-label={`Edit booking ${booking.id}`}
+                            disabled={bookingActionInProgress}
+                          >
+                            <Pencil size={15} /> Edit
+                          </button>
+                        )}
+                        {booking.status === 'Pending' && (
+                          <button
+                            className="table-action"
+                            type="button"
+                            onClick={() => void updateBookingStatus(booking, 'Confirmed')}
+                            disabled={bookingActionInProgress}
+                          >
+                            <Check size={15} /> Confirm
+                          </button>
+                        )}
+                        {(booking.status === 'Pending' || booking.status === 'Confirmed') && (
+                          <button
+                            className="table-action danger-action"
+                            type="button"
+                            onClick={() => void updateBookingStatus(booking, 'Cancelled')}
+                            disabled={bookingActionInProgress}
+                          >
+                            <X size={15} /> Cancel
+                          </button>
+                        )}
+                        {booking.status === 'Confirmed' && (
+                          <button
+                            className="table-action"
+                            type="button"
+                            onClick={() => void updateBookingStatus(booking, 'Completed')}
+                            disabled={bookingActionInProgress}
+                          >
+                            <Check size={15} /> Complete
+                          </button>
+                        )}
+                        <button
+                          className="table-action danger-action"
+                          type="button"
+                          onClick={() => void handleDeleteBooking(booking)}
+                          aria-label={`Delete booking ${booking.id}`}
+                          disabled={bookingActionInProgress}
+                        >
+                          <Trash2 size={15} /> Delete
+                        </button>
                       </td>
                     </tr>
                   ))}

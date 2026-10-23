@@ -60,10 +60,15 @@ public class BookingService : IBookingService
 			throw new ArgumentException("Customer not found.");
 		}
 
-		// Validate resource exists
-		if (!await _resourceRepository.ExistsAsync(createBookingDto.ResourceId))
+		var resource = await _resourceRepository.GetByIdAsync(createBookingDto.ResourceId);
+		if (resource == null)
 		{
 			throw new ArgumentException("Resource not found.");
+		}
+
+		if (!resource.IsAvailable)
+		{
+			throw new InvalidOperationException("Resource is not available for booking.");
 		}
 
 		// Validate dates
@@ -108,25 +113,47 @@ public class BookingService : IBookingService
 			throw new KeyNotFoundException("Booking not found.");
 		}
 
+		if (!Enum.TryParse<BookingStatus>(updateBookingDto.Status, true, out var status) ||
+			!Enum.IsDefined(status))
+		{
+			throw new ArgumentException("Booking status is invalid.");
+		}
+
 		// Validate dates
 		if (updateBookingDto.StartDate >= updateBookingDto.EndDate)
 		{
 			throw new ArgumentException("Start date must be before end date.");
 		}
 
-		// Check resource availability (excluding current booking)
-		if (!await _bookingRepository.IsResourceAvailableAsync(
-			booking.ResourceId,
-			updateBookingDto.StartDate,
-			updateBookingDto.EndDate,
-			id))
+		var datesChanged = booking.StartDate != updateBookingDto.StartDate ||
+			booking.EndDate != updateBookingDto.EndDate;
+		if ((datesChanged || status is BookingStatus.Pending or BookingStatus.Confirmed) &&
+			updateBookingDto.StartDate < DateTime.Now)
 		{
-			throw new InvalidOperationException("Resource is not available for the selected dates.");
+			throw new ArgumentException("Start date cannot be in the past.");
+		}
+
+		if (status is BookingStatus.Pending or BookingStatus.Confirmed)
+		{
+			var resource = await _resourceRepository.GetByIdAsync(booking.ResourceId);
+			if (resource == null || !resource.IsAvailable)
+			{
+				throw new InvalidOperationException("Resource is not available for booking.");
+			}
+
+			if (!await _bookingRepository.IsResourceAvailableAsync(
+				booking.ResourceId,
+				updateBookingDto.StartDate,
+				updateBookingDto.EndDate,
+				id))
+			{
+				throw new InvalidOperationException("Resource is not available for the selected dates.");
+			}
 		}
 
 		booking.StartDate = updateBookingDto.StartDate;
 		booking.EndDate = updateBookingDto.EndDate;
-		booking.Status = Enum.Parse<BookingStatus>(updateBookingDto.Status);
+		booking.Status = status;
 		booking.UpdatedAt = DateTime.UtcNow;
 
 		await _bookingRepository.UpdateAsync(booking);
@@ -144,6 +171,17 @@ public class BookingService : IBookingService
 
 	public async Task<bool> IsResourceAvailableAsync(int resourceId, DateTime startDate, DateTime endDate, int? excludeBookingId = null)
 	{
+		if (startDate >= endDate || startDate < DateTime.Now)
+		{
+			return false;
+		}
+
+		var resource = await _resourceRepository.GetByIdAsync(resourceId);
+		if (resource == null || !resource.IsAvailable)
+		{
+			return false;
+		}
+
 		return await _bookingRepository.IsResourceAvailableAsync(resourceId, startDate, endDate, excludeBookingId);
 	}
 

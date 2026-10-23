@@ -547,6 +547,51 @@
   color: #43584d;
 }
 
+.booking-edit-form {
+  margin-bottom: 24px;
+}
+
+.booking-edit-heading {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0;
+}
+
+.booking-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.table-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0;
+  border: 0;
+  color: #354d43;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.table-action:hover:not(:disabled) {
+  color: #173b35;
+  text-decoration: underline;
+}
+
+.table-action:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.danger-action {
+  color: #8b4938;
+}
+
 .booking-table tbody tr:last-child td {
   border-bottom: 0;
 }

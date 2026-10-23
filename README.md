@@ -1,12 +1,10 @@
 # Bookify
 
-Bookify is a booking management project built with ASP.NET Core 9.
+Bookify is a booking management app built with ASP.NET Core 9 and React.
 
 ## Current status
 
-This project is still in progress.
-
-Right now I am organizing the project structure and building it step by step.
+The app supports managing resources, customers, and bookings.
 
 ## Project structure
 
@@ -18,14 +16,18 @@ Bookify.Api/
 └── Controllers/
 ```
 
-## Notes
+## Features
 
-- .NET 9 project
-- Web API project
-- Using Entity Framework Core
+- Add and view resources and customers.
+- Create bookings and check for overlapping bookings.
+- Edit booking dates, confirm, cancel, complete, and delete bookings.
+- Unavailable resources cannot be booked.
+- Pending and confirmed bookings reserve their time slots. Cancelled and completed bookings do not.
 
-## Next
+## Run locally
 
-- finish the basic structure
-- add the main entities
-- continue with small commits
+1. Start the API with `dotnet run --project Bookify.Api`.
+2. In another terminal, start the frontend with `npm --prefix Bookify.Frontend run dev`.
+3. Open the frontend URL printed by Vite.
+
+The API uses the local SQL Server connection in `Bookify.Api/appsettings.Development.json`.

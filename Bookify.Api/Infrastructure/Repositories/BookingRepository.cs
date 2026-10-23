@@ -50,7 +50,7 @@ public class BookingRepository : Repository<Booking>, IBookingRepository
 	{
 		var query = _dbSet.Where(b =>
 			b.ResourceId == resourceId &&
-			b.Status != BookingStatus.Cancelled &&
+			(b.Status == BookingStatus.Pending || b.Status == BookingStatus.Confirmed) &&
 			((b.StartDate < endDate && b.EndDate > startDate)));
 
 		if (excludeBookingId.HasValue)

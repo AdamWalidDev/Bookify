@@ -1,0 +1,29 @@
+databases:
+  - name: bookify-db
+    databaseName: bookify
+    user: bookify
+    plan: free
+
+services:
+  - type: web
+    name: bookify-api
+    runtime: docker
+    plan: free
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: bookify-db
+          property: connectionString
+      - key: Jwt__Key
+        generateValue: true
+      - key: Jwt__Issuer
+        value: Bookify
+      - key: Admin__Username
+        value: admin
+      - key: Admin__Password
+        value: admin123
+      - key: Cors__AllowedOrigins__0
+        value: "*"
+

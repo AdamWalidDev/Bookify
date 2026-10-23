@@ -15,7 +15,7 @@ builder.Services.AddCors(options =>
 {
 	options.AddPolicy("ReactFrontend", policy =>
 	{
-		policy.WithOrigins("http://localhost:5173", "http://localhost:3000")
+		policy.WithOrigins("http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000")
 			.AllowAnyHeader()
 			.AllowAnyMethod();
 	});
@@ -37,7 +37,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
 	var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-	dbContext.Database.EnsureCreated();
+	dbContext.Database.Migrate();
 }
 
 // Configure the HTTP request pipeline.

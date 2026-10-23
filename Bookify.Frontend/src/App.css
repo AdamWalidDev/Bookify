@@ -694,7 +694,52 @@
 
 .login-card {
   width: 100%;
-  max-width: 360px;
+  max-width: 380px;
   display: grid;
+  grid-template-columns: 1fr;
   gap: 14px;
+  margin-bottom: 0;
+}
+
+.login-card h1 {
+  margin: 0;
+  color: #20352f;
+  font-family: Georgia, serif;
+  font-size: 28px;
+  font-weight: 400;
+}
+
+.demo-credentials-banner {
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid #cfe0d4;
+  border-radius: 4px;
+  background: #f3f8f4;
+  color: #20352f;
+  font-size: 12px;
+}
+
+.demo-credentials-banner strong {
+  display: block;
+  margin-bottom: 3px;
+  color: #173b35;
+  font-size: 12px;
+}
+
+.demo-credentials-banner p {
+  margin: 0;
+  color: #43584d;
+}
+
+.demo-credentials-banner code {
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: #e2ede5;
+  color: #173b35;
+  font-weight: 600;
+}
+
+.demo-login-button {
+  width: 100%;
 }

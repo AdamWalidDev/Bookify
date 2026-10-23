@@ -1,5 +1,7 @@
 using Bookify.Application.Interfaces;
 using Bookify.Application.Services;
+using Bookify.Domain.Entities;
+using Bookify.Domain.Enums;
 using Bookify.Domain.Interfaces;
 using Bookify.Infrastructure.Data;
 using Bookify.Infrastructure.Repositories;
@@ -99,6 +101,8 @@ using (var scope = app.Services.CreateScope())
 	{
 		dbContext.Database.EnsureCreated();
 	}
+
+	SeedDemoDataIfEmpty(dbContext);
 }
 
 // Configure the HTTP request pipeline.
@@ -118,6 +122,116 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+static void SeedDemoDataIfEmpty(ApplicationDbContext dbContext)
+{
+	if (dbContext.Resources.Any() || dbContext.Customers.Any())
+	{
+		return;
+	}
+
+	var now = DateTime.UtcNow;
+
+	var resources = new[]
+	{
+		new Resource
+		{
+			Name = "Nordic Boardroom",
+			Description = "12-seat executive conference room with dual 4K displays and video conferencing.",
+			Capacity = 12,
+			IsAvailable = true,
+			CreatedAt = now
+		},
+		new Resource
+		{
+			Name = "Atelier Workshop Studio",
+			Description = "Open collaborative studio with movable whiteboards, projector, and modular seating.",
+			Capacity = 20,
+			IsAvailable = true,
+			CreatedAt = now
+		},
+		new Resource
+		{
+			Name = "Focus Pod B",
+			Description = "Soundproof acoustic pod for quiet calls and 1-on-1 interviews.",
+			Capacity = 2,
+			IsAvailable = true,
+			CreatedAt = now
+		},
+		new Resource
+		{
+			Name = "Rooftop Lounge",
+			Description = "Event terrace currently undergoing seasonal AV maintenance.",
+			Capacity = 40,
+			IsAvailable = false,
+			CreatedAt = now
+		}
+	};
+
+	var customers = new[]
+	{
+		new Customer
+		{
+			Name = "Emma Lindqvist",
+			Email = "emma.lindqvist@nordicventures.se",
+			Phone = "+46 70 123 45 67",
+			CreatedAt = now
+		},
+		new Customer
+		{
+			Name = "Marcus Vance",
+			Email = "m.vance@atelierdesign.io",
+			Phone = "+1 (555) 234-8910",
+			CreatedAt = now
+		},
+		new Customer
+		{
+			Name = "Sofia Chen",
+			Email = "sofia.chen@krono-labs.com",
+			Phone = "+44 20 7946 0921",
+			CreatedAt = now
+		}
+	};
+
+	dbContext.Resources.AddRange(resources);
+	dbContext.Customers.AddRange(customers);
+	dbContext.SaveChanges();
+
+	var tomorrow = now.Date.AddDays(1);
+	var bookings = new[]
+	{
+		new Booking
+		{
+			CustomerId = customers[0].Id,
+			ResourceId = resources[0].Id,
+			StartDate = tomorrow.AddHours(9),
+			EndDate = tomorrow.AddHours(11),
+			Status = BookingStatus.Confirmed,
+			CreatedAt = now
+		},
+		new Booking
+		{
+			CustomerId = customers[1].Id,
+			ResourceId = resources[1].Id,
+			StartDate = tomorrow.AddHours(13),
+			EndDate = tomorrow.AddHours(16),
+			Status = BookingStatus.Pending,
+			CreatedAt = now
+		},
+		new Booking
+		{
+			CustomerId = customers[2].Id,
+			ResourceId = resources[2].Id,
+			StartDate = tomorrow.AddDays(1).AddHours(10),
+			EndDate = tomorrow.AddDays(1).AddHours(11),
+			Status = BookingStatus.Confirmed,
+			CreatedAt = now
+		}
+	};
+
+	dbContext.Bookings.AddRange(bookings);
+	dbContext.SaveChanges();
+}
 
 static bool IsPostgresConnectionString(string connectionString) =>
 	connectionString.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase) ||

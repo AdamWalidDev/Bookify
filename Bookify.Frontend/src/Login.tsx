@@ -1,17 +1,14 @@
 import { useEffect, useState, type SubmitEvent } from 'react'
-import { ArrowRight, Building2, KeyRound } from 'lucide-react'
+import { ArrowRight, Building2 } from 'lucide-react'
 import { API_URL, setToken } from './api'
 
 type LoginProps = {
   onLogin: () => void
 }
 
-const DEMO_USERNAME = 'admin'
-const DEMO_PASSWORD = 'admin123'
-
 function Login({ onLogin }: LoginProps) {
-  const [username, setUsername] = useState(DEMO_USERNAME)
-  const [password, setPassword] = useState(DEMO_PASSWORD)
+  const [username, setUsername] = useState('admin')
+  const [password, setPassword] = useState('admin123')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSlowWakeup, setIsSlowWakeup] = useState(false)
@@ -23,7 +20,8 @@ function Login({ onLogin }: LoginProps) {
     })
   }, [])
 
-  async function signInWithCredentials(loginUser: string, loginPass: string) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+    event.preventDefault()
     setError('')
     setIsSubmitting(true)
     setIsSlowWakeup(false)
@@ -36,7 +34,7 @@ function Login({ onLogin }: LoginProps) {
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: loginUser, password: loginPass }),
+        body: JSON.stringify({ username, password }),
       })
 
       if (!response.ok) {
@@ -65,17 +63,6 @@ function Login({ onLogin }: LoginProps) {
     }
   }
 
-  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
-    event.preventDefault()
-    await signInWithCredentials(username, password)
-  }
-
-  async function handleDemoLogin() {
-    setUsername(DEMO_USERNAME)
-    setPassword(DEMO_PASSWORD)
-    await signInWithCredentials(DEMO_USERNAME, DEMO_PASSWORD)
-  }
-
   return (
     <div className="login-page">
       <form className="login-card booking-form" onSubmit={handleSubmit}>
@@ -86,28 +73,7 @@ function Login({ onLogin }: LoginProps) {
 
         <div className="login-card-header">
           <h1>Sign in</h1>
-          <p className="login-subtitle">Enter your credentials or use the demo account below.</p>
-        </div>
-
-        <div className="demo-credentials-banner">
-          <div className="demo-banner-header">
-            <span className="demo-banner-badge">
-              <KeyRound size={13} />
-              Demo Account
-            </span>
-            <span className="demo-inline-creds">
-              <code>{DEMO_USERNAME}</code> / <code>{DEMO_PASSWORD}</code>
-            </span>
-          </div>
-          <button
-            type="button"
-            className="demo-login-button"
-            onClick={() => void handleDemoLogin()}
-            disabled={isSubmitting}
-          >
-            <span>{isSubmitting ? 'Signing in...' : 'One-Click Demo Sign In'}</span>
-            <ArrowRight size={14} className="button-arrow" />
-          </button>
+          <p className="login-subtitle">Enter your workspace credentials to continue.</p>
         </div>
 
         <label>

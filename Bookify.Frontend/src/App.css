@@ -1312,83 +1312,10 @@
   font-size: 13px;
 }
 
-.demo-credentials-banner {
-  display: grid;
-  gap: 10px;
-  padding: 12px 13px;
-  border: 1px solid #cbddd1;
-  border-radius: 8px;
-  background: #f2f8f4;
-  color: var(--text-primary);
-}
-
-.demo-banner-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.demo-banner-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--bg-pine);
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.demo-inline-creds {
-  color: var(--text-secondary);
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-}
-
-.demo-inline-creds code {
-  padding: 2px 5px;
-  border-radius: 4px;
-  background: #e1ede5;
-  color: var(--bg-pine);
-  font-family: var(--font-mono);
-  font-weight: 600;
-}
-
-.demo-login-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  height: 36px;
-  border: 0;
-  border-radius: 6px;
-  background: var(--bg-pine);
-  color: #fff;
-  font-size: 12.5px;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background-color 160ms ease,
-    transform 140ms var(--ease-spring),
-    box-shadow 160ms ease;
-}
-
-.demo-login-button:hover:not(:disabled) {
-  background: #1b423a;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(18, 43, 38, 0.2);
-}
-
-.demo-login-button:disabled {
-  cursor: wait;
-  opacity: 0.65;
-}
-
 .button-arrow {
   transition: transform 180ms var(--ease-spring);
 }
 
-.demo-login-button:hover .button-arrow,
 .login-submit-button:hover .button-arrow {
   transform: translateX(3px);
 }

@@ -1,22 +1,12 @@
-import { useEffect, useState, type CSSProperties, type SubmitEvent } from 'react'
+import { useEffect, useState, type SubmitEvent } from 'react'
 import {
-  ArrowUpRight,
-  Building2,
-  Calendar,
   CalendarPlus,
   Check,
-  Clock,
-  LogOut,
-  Mail,
   Pencil,
-  Phone,
   Plus,
-  Power,
   RefreshCw,
   Search,
-  Sparkles,
   Trash2,
-  UsersRound,
   X,
 } from 'lucide-react'
 import './App.css'
@@ -85,14 +75,6 @@ const createFutureSlot = (daysAhead: number, startHour: number, durationHours: n
     endDate: toDateTimeLocal(end.toISOString()),
   }
 }
-
-const getInitials = (name: string) =>
-  name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? '')
-    .join('')
 
 const getResponseMessage = async (response: Response) => {
   const body = await response.text()
@@ -428,7 +410,7 @@ function App({ onLogout }: AppProps) {
         ),
       )
       setResourceFormSuccess(
-        `${resource.name} marked as ${nextAvailability ? 'available' : 'unavailable'}.`,
+        `${resource.name} marked as ${nextAvailability ? 'available' : 'maintenance'}.`,
       )
     } catch (toggleError) {
       setResourceFormError(
@@ -691,107 +673,54 @@ function App({ onLogout }: AppProps) {
     <div className="app-shell">
       <header className="topbar">
         <div className="topbar-inner">
-          <a className="brand" href="#resources" aria-label="Bookify home">
-            <span className="brand-mark"><Building2 size={18} /></span>
-            <span className="brand-title">Bookify</span>
-            <span className="brand-badge">Workspace</span>
-          </a>
+          <div className="topbar-left">
+            <a className="brand" href="#resources" aria-label="Bookify home">
+              <span className="brand-title">Bookify</span>
+              <span className="brand-divider" aria-hidden="true">/</span>
+              <span className="brand-badge">Workspace</span>
+            </a>
 
-          <nav className="topbar-nav" aria-label="Main navigation">
-            <a
-              href="#resources"
-              aria-current={activePage === 'resources' ? 'page' : undefined}
-            >
-              <span>Resources</span>
-              <span className="nav-count">{resources.length}</span>
-            </a>
-            <a
-              href="#customers"
-              aria-current={activePage === 'customers' ? 'page' : undefined}
-            >
-              <span>Customers</span>
-              <span className="nav-count">{customers.length}</span>
-            </a>
-            <a
-              href="#bookings"
-              aria-current={activePage === 'bookings' ? 'page' : undefined}
-            >
-              <span>Bookings</span>
-              <span className="nav-count">{bookings.length}</span>
-            </a>
-          </nav>
+            <nav className="topbar-nav" aria-label="Main navigation">
+              <a
+                href="#resources"
+                aria-current={activePage === 'resources' ? 'page' : undefined}
+              >
+                Resources
+              </a>
+              <a
+                href="#customers"
+                aria-current={activePage === 'customers' ? 'page' : undefined}
+              >
+                Customers
+              </a>
+              <a
+                href="#bookings"
+                aria-current={activePage === 'bookings' ? 'page' : undefined}
+              >
+                Bookings
+              </a>
+            </nav>
+          </div>
 
           <div className="topbar-right">
-            <span className="workspace-label">
-              <span className="live-indicator" />
-              Operational
-            </span>
+            <button
+              type="button"
+              className="schedule-slot-btn"
+              onClick={() => navigateTo('bookings')}
+            >
+              <CalendarPlus size={14} />
+              <span>Schedule a Slot</span>
+            </button>
             <button type="button" className="signout-button" onClick={onLogout}>
-              <LogOut size={14} />
-              <span>Sign out</span>
+              Sign out
             </button>
           </div>
         </div>
       </header>
 
       <main className="main-content">
-        <section className="kpi-strip" aria-label="Workspace metrics">
-          <button
-            type="button"
-            className={`kpi-card ${activePage === 'resources' ? 'kpi-card-active' : ''}`}
-            onClick={() => navigateTo('resources')}
-            style={{ '--i': 0 } as CSSProperties}
-          >
-            <span className="kpi-label">BOOKABLE SPACES</span>
-            <strong className="kpi-value">{availableResourcesCount}<span>/{resources.length}</span></strong>
-            <span className="kpi-meta">{totalCapacity} active seat capacity</span>
-          </button>
-
-          <button
-            type="button"
-            className={`kpi-card ${activePage === 'customers' ? 'kpi-card-active' : ''}`}
-            onClick={() => navigateTo('customers')}
-            style={{ '--i': 1 } as CSSProperties}
-          >
-            <span className="kpi-label">REGISTERED CLIENTS</span>
-            <strong className="kpi-value">{customers.length}</strong>
-            <span className="kpi-meta">Verified directory accounts</span>
-          </button>
-
-          <button
-            type="button"
-            className={`kpi-card ${activePage === 'bookings' ? 'kpi-card-active' : ''}`}
-            onClick={() => navigateTo('bookings')}
-            style={{ '--i': 2 } as CSSProperties}
-          >
-            <span className="kpi-label">ACTIVE RESERVATIONS</span>
-            <strong className="kpi-value">{activeBookingsCount}</strong>
-            <span className="kpi-meta">Confirmed &amp; pending slots</span>
-          </button>
-
-          <button
-            type="button"
-            className="kpi-card kpi-card-cta"
-            onClick={() => navigateTo('bookings')}
-            style={{ '--i': 3 } as CSSProperties}
-          >
-            <span className="kpi-label">QUICK ACTION</span>
-            <strong className="kpi-cta-title">
-              Schedule a Slot <ArrowUpRight size={18} />
-            </strong>
-            <span className="kpi-meta">Real-time conflict checking</span>
-          </button>
-        </section>
-
-        <section className="page-heading" key={activePage}>
-          <div>
-            <p className="eyebrow">
-              {activePage === 'resources'
-                ? 'SPACE DIRECTORY'
-                : activePage === 'customers'
-                  ? 'CLIENT DIRECTORY'
-                  : 'RESERVATION LEDGER'}
-            </p>
+        <section className="page-heading">
+          <div className="page-heading-left">
             <h1>
               {activePage === 'resources'
                 ? 'Resources & Spaces'
@@ -801,30 +730,40 @@ function App({ onLogout }: AppProps) {
             </h1>
             <p className="page-description">
               {activePage === 'resources'
-                ? 'Manage architectural rooms, studios, and equipment capacity.'
+                ? 'Manage architectural rooms, studios, and equipment capacity'
                 : activePage === 'customers'
-                  ? 'Directory of team members and organizations authorized to reserve spaces.'
-                  : 'Create conflict-free reservations and manage live booking statuses.'}
+                  ? 'Directory of team members and organizations authorized to reserve spaces'
+                  : 'Create conflict-free reservations and manage live booking statuses'}
             </p>
           </div>
-          {activePage === 'resources' && (
-            <div className="resource-count">
-              <strong>{resources.length}</strong>
-              <span>spaces listed</span>
-            </div>
-          )}
+
+          <div className="telemetry-strip" aria-label="Workspace telemetry">
+            <span>
+              Spaces: <strong>{availableResourcesCount}/{resources.length}</strong> available
+            </span>
+            <span className="telemetry-dot" aria-hidden="true">&bull;</span>
+            <span>
+              Capacity: <strong>{totalCapacity}</strong> seats
+            </span>
+            <span className="telemetry-dot" aria-hidden="true">&bull;</span>
+            <span>
+              Active bookings: <strong>{activeBookingsCount}</strong>
+            </span>
+            <span className="telemetry-dot" aria-hidden="true">&bull;</span>
+            <span>
+              Clients: <strong>{customers.length}</strong>
+            </span>
+          </div>
         </section>
 
         {activePage === 'resources' && (
-          <section id="resources" className="resource-section view-panel" aria-labelledby="resource-list-title">
-            <div className="section-heading">
-              <div>
-                <h2 id="resource-list-title">All resources</h2>
-                <p>Availability, seating capacity, and instant booking</p>
-              </div>
-              <div className="resource-actions">
+          <section id="resources" className="view-panel" aria-labelledby="resource-list-title">
+            <h2 id="resource-list-title" className="sr-only">Resources &amp; Spaces</h2>
+
+            <div className="control-toolbar">
+              <div className="toolbar-left">
                 <div className="search-box">
-                  <Search size={14} />
+                  <Search size={13} />
                   <input
                     type="search"
                     value={resourceSearch}
@@ -856,6 +795,19 @@ function App({ onLogout }: AppProps) {
                     Maintenance
                   </button>
                 </div>
+              </div>
+
+              <div className="toolbar-right">
+                <button
+                  className={`icon-button ${isLoading ? 'is-spinning' : ''}`}
+                  type="button"
+                  title="Refresh resources"
+                  aria-label="Refresh resources"
+                  onClick={() => setReload((value) => value + 1)}
+                  disabled={isLoading}
+                >
+                  <RefreshCw size={14} />
+                </button>
                 <button
                   className="add-resource-button"
                   type="button"
@@ -867,30 +819,20 @@ function App({ onLogout }: AppProps) {
                   aria-expanded={isResourceFormOpen}
                   aria-controls="resource-create-form"
                 >
-                  <Plus size={16} />
-                  {isResourceFormOpen ? 'Close form' : 'Add resource'}
-                </button>
-                <button
-                  className={`icon-button ${isLoading ? 'is-spinning' : ''}`}
-                  type="button"
-                  title="Refresh resources"
-                  aria-label="Refresh resources"
-                  onClick={() => setReload((value) => value + 1)}
-                  disabled={isLoading}
-                >
-                  <RefreshCw size={16} />
+                  <Plus size={14} />
+                  <span>{isResourceFormOpen ? 'Close form' : 'Add resource'}</span>
                 </button>
               </div>
             </div>
 
             {resourceFormSuccess && (
-              <p className="form-message success-text status-banner" role="status">
-                <Check size={15} />
+              <p className="status-banner success-text" role="status">
+                <Check size={14} />
                 <span>{resourceFormSuccess}</span>
               </p>
             )}
             {resourceFormError && !isResourceFormOpen && (
-              <p className="form-message error-text status-banner" role="alert">
+              <p className="status-banner error-text" role="alert">
                 <span>{resourceFormError}</span>
               </p>
             )}
@@ -898,7 +840,7 @@ function App({ onLogout }: AppProps) {
             {isResourceFormOpen && (
               <form
                 id="resource-create-form"
-                className="resource-form animated-drawer"
+                className="resource-form"
                 onSubmit={handleCreateResource}
               >
                 <label>
@@ -910,7 +852,7 @@ function App({ onLogout }: AppProps) {
                     onChange={(event) =>
                       setResourceForm((current) => ({ ...current, name: event.target.value }))
                     }
-                    placeholder="e.g. Nordic Boardroom"
+                    placeholder="e.g. Boardroom A"
                   />
                 </label>
                 <label>
@@ -921,7 +863,7 @@ function App({ onLogout }: AppProps) {
                     onChange={(event) =>
                       setResourceForm((current) => ({ ...current, description: event.target.value }))
                     }
-                    placeholder="AV equipment, seating layout, lighting..."
+                    placeholder="AV equipment, seating layout..."
                   />
                 </label>
                 <label>
@@ -953,18 +895,16 @@ function App({ onLogout }: AppProps) {
                 <div className="resource-form-footer">
                   <p className="form-message error-text" role="alert">{resourceFormError}</p>
                   <button className="create-button" type="submit" disabled={isCreatingResource}>
-                    <Plus size={16} />
-                    {isCreatingResource ? 'Adding...' : 'Save resource'}
+                    <Plus size={14} />
+                    {isCreatingResource ? 'Saving...' : 'Save resource'}
                   </button>
                 </div>
               </form>
             )}
 
             {isLoading ? (
-              <div className="skeleton-grid" role="status" aria-label="Loading resources">
-                {[0, 1, 2].map((item) => (
-                  <div key={item} className="skeleton-card" />
-                ))}
+              <div className="data-list-container" role="status" aria-label="Loading resources">
+                <div className="empty-state">Loading resources...</div>
               </div>
             ) : error ? (
               <div className="message error-message" role="alert">
@@ -974,86 +914,92 @@ function App({ onLogout }: AppProps) {
                 </button>
               </div>
             ) : filteredResources.length === 0 ? (
-              <p className="message">No matching resources found.</p>
+              <div className="data-list-container">
+                <div className="empty-state">No matching resources found.</div>
+              </div>
             ) : (
-              <div className="resource-grid">
-                {filteredResources.map((resource, index) => (
-                  <article
-                    className={`resource-card ${!resource.isAvailable ? 'resource-card-muted' : ''}`}
-                    key={resource.id}
-                    style={{ '--i': index } as CSSProperties}
-                  >
-                    <div className="resource-card-top">
-                      <span className="resource-icon"><Building2 size={18} /></span>
-                      <span className={`availability ${resource.isAvailable ? 'available' : 'unavailable'}`}>
-                        <span className="status-dot" />
-                        {resource.isAvailable ? 'Available' : 'Unavailable'}
-                      </span>
-                    </div>
-                    <h3>{resource.name}</h3>
-                    <p className="resource-description">
-                      {resource.description || 'No description provided.'}
-                    </p>
-                    <div className="capacity">
-                      <div className="capacity-info">
-                        <UsersRound size={15} />
-                        <span>Up to <strong>{resource.capacity}</strong> people</span>
+              <div className="data-list-container" role="table" aria-label="Resources list">
+                <div className="resource-grid-header" role="row">
+                  <div className="col-resource" role="columnheader">Resource</div>
+                  <div className="col-capacity" role="columnheader">Capacity</div>
+                  <div className="col-status" role="columnheader">Status</div>
+                  <div className="col-actions" role="columnheader">Actions</div>
+                </div>
+
+                <div className="data-list-body" role="rowgroup">
+                  {filteredResources.map((resource) => (
+                    <div className="resource-grid-row" role="row" key={resource.id}>
+                      <div className="col-resource" role="cell">
+                        <div className="resource-primary-line">
+                          <span className="resource-id">
+                            #{String(resource.id).padStart(2, '0')}
+                          </span>
+                          <span className="resource-name">{resource.name}</span>
+                        </div>
+                        <p className="resource-description">
+                          {resource.description || 'No description provided.'}
+                        </p>
                       </div>
-                      <span className="resource-id">#{String(resource.id).padStart(2, '0')}</span>
-                    </div>
-                    <div className="resource-card-actions">
-                      {resource.isAvailable && (
+
+                      <div className="col-capacity" role="cell">
+                        <span className="capacity-text">Up to {resource.capacity} people</span>
+                      </div>
+
+                      <div className="col-status" role="cell">
+                        <span className="inline-status">
+                          <span
+                            className={`status-dot ${
+                              resource.isAvailable ? 'dot-emerald' : 'dot-amber'
+                            }`}
+                          />
+                          <span>{resource.isAvailable ? 'Available' : 'Maintenance'}</span>
+                        </span>
+                      </div>
+
+                      <div className="col-actions" role="cell">
                         <button
                           type="button"
-                          className="card-primary-action"
+                          className="row-btn-primary"
                           onClick={() => handleQuickBookResource(resource)}
+                          disabled={!resource.isAvailable}
                         >
-                          <CalendarPlus size={14} />
-                          <span>Book space</span>
+                          Book space
                         </button>
-                      )}
-                      <button
-                        type="button"
-                        className="card-secondary-action"
-                        onClick={() => void handleToggleResourceAvailability(resource)}
-                        disabled={resourceActionBusyId === resource.id}
-                        title={
-                          resource.isAvailable
-                            ? 'Mark space as unavailable'
-                            : 'Mark space as available'
-                        }
-                      >
-                        <Power size={13} />
-                        <span>{resource.isAvailable ? 'Pause' : 'Activate'}</span>
-                      </button>
-                      <button
-                        type="button"
-                        className="card-danger-action"
-                        onClick={() => void handleDeleteResource(resource)}
-                        disabled={resourceActionBusyId === resource.id}
-                        aria-label={`Delete ${resource.name}`}
-                        title="Delete resource"
-                      >
-                        <Trash2 size={14} />
-                      </button>
+                        <button
+                          type="button"
+                          className="row-btn-secondary"
+                          onClick={() => void handleToggleResourceAvailability(resource)}
+                          disabled={resourceActionBusyId === resource.id}
+                        >
+                          {resource.isAvailable ? 'Pause' : 'Resume'}
+                        </button>
+                        <button
+                          type="button"
+                          className="row-btn-delete"
+                          onClick={() => void handleDeleteResource(resource)}
+                          disabled={resourceActionBusyId === resource.id}
+                          aria-label={`Delete ${resource.name}`}
+                          title="Delete resource"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
                     </div>
-                  </article>
-                ))}
+                  ))}
+                </div>
               </div>
             )}
           </section>
         )}
 
         {activePage === 'customers' && (
-          <section id="customers" className="customer-section view-panel" aria-labelledby="customer-list-title">
-            <div className="section-heading">
-              <div>
-                <h2 id="customer-list-title">Customers</h2>
-                <p>People and teams who can book your resources</p>
-              </div>
-              <div className="resource-actions">
+          <section id="customers" className="view-panel" aria-labelledby="customer-list-title">
+            <h2 id="customer-list-title" className="sr-only">Customers</h2>
+
+            <div className="control-toolbar">
+              <div className="toolbar-left">
                 <div className="search-box">
-                  <Search size={14} />
+                  <Search size={13} />
                   <input
                     type="search"
                     value={customerSearch}
@@ -1062,6 +1008,19 @@ function App({ onLogout }: AppProps) {
                     aria-label="Search customers"
                   />
                 </div>
+              </div>
+
+              <div className="toolbar-right">
+                <button
+                  className={`icon-button ${areCustomersLoading ? 'is-spinning' : ''}`}
+                  type="button"
+                  title="Refresh customers"
+                  aria-label="Refresh customers"
+                  onClick={() => setCustomersReload((value) => value + 1)}
+                  disabled={areCustomersLoading}
+                >
+                  <RefreshCw size={14} />
+                </button>
                 <button
                   className="add-resource-button"
                   type="button"
@@ -1073,30 +1032,20 @@ function App({ onLogout }: AppProps) {
                   aria-expanded={isCustomerFormOpen}
                   aria-controls="customer-create-form"
                 >
-                  <Plus size={16} />
-                  {isCustomerFormOpen ? 'Close form' : 'Add customer'}
-                </button>
-                <button
-                  className={`icon-button ${areCustomersLoading ? 'is-spinning' : ''}`}
-                  type="button"
-                  title="Refresh customers"
-                  aria-label="Refresh customers"
-                  onClick={() => setCustomersReload((value) => value + 1)}
-                  disabled={areCustomersLoading}
-                >
-                  <RefreshCw size={16} />
+                  <Plus size={14} />
+                  <span>{isCustomerFormOpen ? 'Close form' : 'Add customer'}</span>
                 </button>
               </div>
             </div>
 
             {customerFormSuccess && (
-              <p className="form-message success-text status-banner" role="status">
-                <Check size={15} />
+              <p className="status-banner success-text" role="status">
+                <Check size={14} />
                 <span>{customerFormSuccess}</span>
               </p>
             )}
             {customerFormError && !isCustomerFormOpen && (
-              <p className="form-message error-text status-banner" role="alert">
+              <p className="status-banner error-text" role="alert">
                 <span>{customerFormError}</span>
               </p>
             )}
@@ -1104,7 +1053,7 @@ function App({ onLogout }: AppProps) {
             {isCustomerFormOpen && (
               <form
                 id="customer-create-form"
-                className="customer-form animated-drawer"
+                className="customer-form"
                 onSubmit={handleCreateCustomer}
               >
                 <label>
@@ -1150,15 +1099,17 @@ function App({ onLogout }: AppProps) {
                 <div className="customer-form-footer">
                   <p className="form-message error-text" role="alert">{customerFormError}</p>
                   <button className="create-button" type="submit" disabled={isCreatingCustomer}>
-                    <Plus size={16} />
-                    {isCreatingCustomer ? 'Adding...' : 'Save customer'}
+                    <Plus size={14} />
+                    {isCreatingCustomer ? 'Saving...' : 'Save customer'}
                   </button>
                 </div>
               </form>
             )}
 
             {areCustomersLoading ? (
-              <p className="message" role="status">Loading customers...</p>
+              <div className="data-list-container" role="status">
+                <div className="empty-state">Loading customers...</div>
+              </div>
             ) : customersError ? (
               <div className="message error-message" role="alert">
                 <span>{customersError}</span>
@@ -1167,7 +1118,9 @@ function App({ onLogout }: AppProps) {
                 </button>
               </div>
             ) : filteredCustomers.length === 0 ? (
-              <p className="message">No matching customers found.</p>
+              <div className="data-list-container">
+                <div className="empty-state">No matching customers found.</div>
+              </div>
             ) : (
               <div className="booking-table-wrap">
                 <table className="booking-table">
@@ -1176,54 +1129,40 @@ function App({ onLogout }: AppProps) {
                       <th scope="col">Customer</th>
                       <th scope="col">Email</th>
                       <th scope="col">Phone</th>
-                      <th scope="col">Actions</th>
+                      <th scope="col" className="text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredCustomers.map((customer, index) => (
-                      <tr key={customer.id} style={{ '--i': index } as CSSProperties}>
-                        <td className="booking-resource">
-                          <div className="customer-cell">
-                            <span className="avatar-badge">{getInitials(customer.name)}</span>
-                            <div>
-                              <strong>{customer.name}</strong>
-                              <span className="cell-sub">ID #{String(customer.id).padStart(2, '0')}</span>
-                            </div>
-                          </div>
-                        </td>
+                    {filteredCustomers.map((customer) => (
+                      <tr key={customer.id}>
                         <td>
-                          <span className="inline-icon-text">
-                            <Mail size={13} />
-                            {customer.email}
+                          <span className="resource-id">
+                            #{String(customer.id).padStart(2, '0')}
                           </span>
+                          <span className="resource-name">{customer.name}</span>
                         </td>
-                        <td className="mono-cell">
-                          {customer.phone ? (
-                            <span className="inline-icon-text">
-                              <Phone size={13} />
-                              {customer.phone}
-                            </span>
-                          ) : (
-                            '—'
-                          )}
-                        </td>
-                        <td className="booking-actions">
-                          <button
-                            type="button"
-                            className="table-action"
-                            onClick={() => handleQuickBookCustomer(customer)}
-                          >
-                            <Calendar size={14} /> New booking
-                          </button>
-                          <button
-                            type="button"
-                            className="table-action danger-action"
-                            onClick={() => void handleDeleteCustomer(customer)}
-                            disabled={customerActionBusyId === customer.id}
-                            aria-label={`Delete ${customer.name}`}
-                          >
-                            <Trash2 size={14} /> Remove
-                          </button>
+                        <td>{customer.email}</td>
+                        <td className="mono-cell">{customer.phone || '—'}</td>
+                        <td>
+                          <div className="booking-actions">
+                            <button
+                              type="button"
+                              className="row-btn-secondary"
+                              onClick={() => handleQuickBookCustomer(customer)}
+                            >
+                              New booking
+                            </button>
+                            <button
+                              type="button"
+                              className="row-btn-delete"
+                              onClick={() => void handleDeleteCustomer(customer)}
+                              disabled={customerActionBusyId === customer.id}
+                              aria-label={`Delete ${customer.name}`}
+                              title="Remove customer"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -1235,16 +1174,14 @@ function App({ onLogout }: AppProps) {
         )}
 
         {activePage === 'bookings' && (
-          <section id="bookings" className="booking-section view-panel" aria-labelledby="booking-list-title">
+          <section id="bookings" className="view-panel" aria-labelledby="booking-list-title">
             <div className="booking-create-heading">
               <div>
                 <h2>New reservation</h2>
                 <p>Select a customer, available space, and time window.</p>
               </div>
               <div className="quick-slot-bar" aria-label="Quick time presets">
-                <span className="quick-slot-label">
-                  <Sparkles size={13} /> Quick presets:
-                </span>
+                <span className="quick-slot-label">Presets:</span>
                 <button
                   type="button"
                   className="preset-chip"
@@ -1257,25 +1194,27 @@ function App({ onLogout }: AppProps) {
                   className="preset-chip"
                   onClick={() => applyQuickSlot(2, 14, 2)}
                 >
-                  +2 Days 14:00–16:00
+                  +2d 14:00–16:00
                 </button>
                 <button
                   type="button"
                   className="preset-chip"
                   onClick={() => applyQuickSlot(3, 10, 3)}
                 >
-                  +3 Days 10:00–13:00
+                  +3d 10:00–13:00
                 </button>
               </div>
             </div>
 
             {customersError ? (
-              <p className="form-message error-text" role="alert">{customersError}</p>
+              <p className="status-banner error-text" role="alert">{customersError}</p>
             ) : resources.filter((resource) => resource.isAvailable).length === 0 ||
               customers.length === 0 ? (
-              <p className="message">
-                Add a customer and at least one available resource before creating a booking.
-              </p>
+              <div className="data-list-container">
+                <div className="empty-state">
+                  Add a customer and at least one available resource before creating a booking.
+                </div>
+              </div>
             ) : (
               <form className="booking-form" onSubmit={handleCreateBooking}>
                 <label>
@@ -1353,19 +1292,16 @@ function App({ onLogout }: AppProps) {
                     )}
                   </div>
                   <button className="create-button" type="submit" disabled={isCreatingBooking}>
-                    <Plus size={16} />
+                    <Plus size={14} />
                     {isCreatingBooking ? 'Scheduling...' : 'Create booking'}
                   </button>
                 </div>
               </form>
             )}
 
-            <div className="section-heading">
-              <div>
-                <h2 id="booking-list-title">Bookings</h2>
-                <p>Scheduled use of your resources</p>
-              </div>
-              <div className="resource-actions">
+            <div className="control-toolbar">
+              <div className="toolbar-left">
+                <h2 id="booking-list-title" className="toolbar-section-title">Scheduled bookings</h2>
                 <div className="segmented-control" role="group" aria-label="Filter bookings by status">
                   {(['All', 'Confirmed', 'Pending', 'Completed', 'Cancelled'] as const).map(
                     (status) => (
@@ -1380,6 +1316,8 @@ function App({ onLogout }: AppProps) {
                     ),
                   )}
                 </div>
+              </div>
+              <div className="toolbar-right">
                 <button
                   className={`icon-button ${areBookingsLoading ? 'is-spinning' : ''}`}
                   type="button"
@@ -1388,26 +1326,26 @@ function App({ onLogout }: AppProps) {
                   onClick={() => setBookingsReload((value) => value + 1)}
                   disabled={areBookingsLoading}
                 >
-                  <RefreshCw size={16} />
+                  <RefreshCw size={14} />
                 </button>
               </div>
             </div>
 
             {bookingActionError && (
-              <p className="form-message error-text status-banner" role="alert">
+              <p className="status-banner error-text" role="alert">
                 {bookingActionError}
               </p>
             )}
             {bookingActionSuccess && (
-              <p className="form-message success-text status-banner" role="status">
-                <Check size={15} />
+              <p className="status-banner success-text" role="status">
+                <Check size={14} />
                 <span>{bookingActionSuccess}</span>
               </p>
             )}
 
             {editingBooking && (
               <form
-                className="booking-form booking-edit-form animated-drawer"
+                className="booking-form booking-edit-form"
                 onSubmit={handleUpdateBooking}
               >
                 <div className="booking-create-heading booking-edit-heading">
@@ -1421,7 +1359,7 @@ function App({ onLogout }: AppProps) {
                     aria-label="Close booking editor"
                     onClick={() => setEditingBooking(null)}
                   >
-                    <X size={17} />
+                    <X size={14} />
                   </button>
                 </div>
                 <label>
@@ -1454,9 +1392,9 @@ function App({ onLogout }: AppProps) {
                   />
                 </label>
                 <div className="booking-form-footer">
-                  <span className="form-message">Current status: <strong>{editingBooking.status}</strong></span>
+                  <span className="form-message">Status: <strong>{editingBooking.status}</strong></span>
                   <button className="create-button" type="submit" disabled={bookingActionInProgress}>
-                    <Check size={16} />
+                    <Check size={14} />
                     {bookingActionInProgress ? 'Saving...' : 'Save changes'}
                   </button>
                 </div>
@@ -1464,7 +1402,9 @@ function App({ onLogout }: AppProps) {
             )}
 
             {areBookingsLoading ? (
-              <p className="message" role="status">Loading bookings...</p>
+              <div className="data-list-container" role="status">
+                <div className="empty-state">Loading bookings...</div>
+              </div>
             ) : bookingsError ? (
               <div className="message error-message" role="alert">
                 <span>{bookingsError}</span>
@@ -1473,7 +1413,9 @@ function App({ onLogout }: AppProps) {
                 </button>
               </div>
             ) : filteredBookings.length === 0 ? (
-              <p className="message">No bookings match the selected filter.</p>
+              <div className="data-list-container">
+                <div className="empty-state">No bookings match the selected filter.</div>
+              </div>
             ) : (
               <div className="booking-table-wrap">
                 <table className="booking-table">
@@ -1485,79 +1427,87 @@ function App({ onLogout }: AppProps) {
                       <th scope="col">Starts</th>
                       <th scope="col">Ends</th>
                       <th scope="col">Status</th>
-                      <th scope="col">Actions</th>
+                      <th scope="col" className="text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredBookings.map((booking, index) => (
-                      <tr key={booking.id} style={{ '--i': index } as CSSProperties}>
+                    {filteredBookings.map((booking) => (
+                      <tr key={booking.id}>
                         <td className="mono-cell">#{String(booking.id).padStart(2, '0')}</td>
                         <td className="booking-resource">{booking.resourceName}</td>
                         <td>{booking.customerName}</td>
-                        <td className="mono-cell">
-                          <span className="inline-icon-text">
-                            <Clock size={13} />
-                            {formatDate(booking.startDate)}
-                          </span>
-                        </td>
+                        <td className="mono-cell">{formatDate(booking.startDate)}</td>
                         <td className="mono-cell">{formatDate(booking.endDate)}</td>
                         <td>
-                          <span className={`booking-status status-${booking.status.toLowerCase()}`}>
-                            <span className="status-dot" />
-                            {booking.status}
+                          <span className="inline-status">
+                            <span
+                              className={`status-dot ${
+                                booking.status === 'Confirmed'
+                                  ? 'dot-emerald'
+                                  : booking.status === 'Pending'
+                                    ? 'dot-amber'
+                                    : booking.status === 'Cancelled'
+                                      ? 'dot-rose'
+                                      : 'dot-zinc'
+                              }`}
+                            />
+                            <span>{booking.status}</span>
                           </span>
                         </td>
-                        <td className="booking-actions">
-                          {(booking.status === 'Pending' || booking.status === 'Confirmed') && (
+                        <td>
+                          <div className="booking-actions">
+                            {(booking.status === 'Pending' || booking.status === 'Confirmed') && (
+                              <button
+                                className="row-btn-secondary"
+                                type="button"
+                                onClick={() => startEditingBooking(booking)}
+                                aria-label={`Edit booking ${booking.id}`}
+                                disabled={bookingActionInProgress}
+                              >
+                                <Pencil size={12} /> Edit
+                              </button>
+                            )}
+                            {booking.status === 'Pending' && (
+                              <button
+                                className="row-btn-primary"
+                                type="button"
+                                onClick={() => void updateBookingStatus(booking, 'Confirmed')}
+                                disabled={bookingActionInProgress}
+                              >
+                                Confirm
+                              </button>
+                            )}
+                            {(booking.status === 'Pending' || booking.status === 'Confirmed') && (
+                              <button
+                                className="row-btn-secondary"
+                                type="button"
+                                onClick={() => void updateBookingStatus(booking, 'Cancelled')}
+                                disabled={bookingActionInProgress}
+                              >
+                                Cancel
+                              </button>
+                            )}
+                            {booking.status === 'Confirmed' && (
+                              <button
+                                className="row-btn-secondary"
+                                type="button"
+                                onClick={() => void updateBookingStatus(booking, 'Completed')}
+                                disabled={bookingActionInProgress}
+                              >
+                                Complete
+                              </button>
+                            )}
                             <button
-                              className="table-action"
+                              className="row-btn-delete"
                               type="button"
-                              onClick={() => startEditingBooking(booking)}
-                              aria-label={`Edit booking ${booking.id}`}
+                              onClick={() => void handleDeleteBooking(booking)}
+                              aria-label={`Delete booking ${booking.id}`}
+                              title="Delete booking"
                               disabled={bookingActionInProgress}
                             >
-                              <Pencil size={14} /> Edit
+                              <Trash2 size={14} />
                             </button>
-                          )}
-                          {booking.status === 'Pending' && (
-                            <button
-                              className="table-action confirm-action"
-                              type="button"
-                              onClick={() => void updateBookingStatus(booking, 'Confirmed')}
-                              disabled={bookingActionInProgress}
-                            >
-                              <Check size={14} /> Confirm
-                            </button>
-                          )}
-                          {(booking.status === 'Pending' || booking.status === 'Confirmed') && (
-                            <button
-                              className="table-action danger-action"
-                              type="button"
-                              onClick={() => void updateBookingStatus(booking, 'Cancelled')}
-                              disabled={bookingActionInProgress}
-                            >
-                              <X size={14} /> Cancel
-                            </button>
-                          )}
-                          {booking.status === 'Confirmed' && (
-                            <button
-                              className="table-action"
-                              type="button"
-                              onClick={() => void updateBookingStatus(booking, 'Completed')}
-                              disabled={bookingActionInProgress}
-                            >
-                              <Check size={14} /> Complete
-                            </button>
-                          )}
-                          <button
-                            className="table-action danger-action"
-                            type="button"
-                            onClick={() => void handleDeleteBooking(booking)}
-                            aria-label={`Delete booking ${booking.id}`}
-                            disabled={bookingActionInProgress}
-                          >
-                            <Trash2 size={14} /> Delete
-                          </button>
+                          </div>
                         </td>
                       </tr>
                     ))}

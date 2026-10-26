@@ -1,54 +1,29 @@
 :root {
-  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-display: 'Instrument Serif', Georgia, serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  --bg-canvas: #fafafa;
-  --bg-surface: #ffffff;
-  --bg-subtle: #f4f4f5;
-  --bg-elevated: #fafafa;
-  --bg-pine: #18181b;
-  --bg-pine-deep: #09090b;
+  --zinc-50: #fafafa;
+  --zinc-100: #f4f4f5;
+  --zinc-200: #e4e4e7;
+  --zinc-300: #d4d4d8;
+  --zinc-400: #a1a1aa;
+  --zinc-500: #71717a;
+  --zinc-600: #52525b;
+  --zinc-700: #3f3f46;
+  --zinc-800: #27272a;
+  --zinc-900: #18181b;
+  --zinc-950: #09090b;
 
-  --text-primary: #09090b;
-  --text-secondary: #52525b;
-  --text-muted: #71717a;
-
-  --border-subtle: #e4e4e7;
-  --border-strong: #d4d4d8;
-
-  --accent-terracotta: #b84a2c;
-  --accent-terracotta-hover: #993b21;
-  --accent-ochre: #e09f50;
-  --accent-pine: #18181b;
-
-  --status-success-bg: #ecfdf5;
-  --status-success-text: #065f46;
-  --status-success-dot: #10b981;
-
-  --status-warning-bg: #fffbeb;
-  --status-warning-text: #92400e;
-  --status-warning-dot: #f59e0b;
-
-  --status-danger-bg: #fef2f2;
-  --status-danger-text: #991b1b;
-  --status-danger-dot: #ef4444;
-
-  --status-neutral-bg: #f4f4f5;
-  --status-neutral-text: #3f3f46;
-  --status-neutral-dot: #71717a;
-
-  --shadow-xs: 0 1px 2px rgba(9, 9, 11, 0.04);
-  --shadow-sm: 0 2px 8px -2px rgba(9, 9, 11, 0.06), 0 1px 3px rgba(9, 9, 11, 0.04);
-  --shadow-md: 0 10px 26px -6px rgba(9, 9, 11, 0.08), 0 3px 8px -2px rgba(9, 9, 11, 0.04);
-  --shadow-lg: 0 22px 48px -12px rgba(9, 9, 11, 0.12), 0 4px 12px -2px rgba(9, 9, 11, 0.05);
-
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
+  --emerald-500: #10b981;
+  --emerald-600: #059669;
+  --amber-500: #f59e0b;
+  --rose-50: #fff1f2;
+  --rose-500: #f43f5e;
+  --rose-600: #e11d48;
 
   font-family: var(--font-sans);
-  color: var(--text-primary);
-  background: var(--bg-canvas);
+  color: var(--zinc-900);
+  background-color: var(--zinc-50);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -60,15 +35,12 @@
   box-sizing: border-box;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
 body {
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
-  background-color: var(--bg-canvas);
+  background-color: var(--zinc-50);
+  color: var(--zinc-900);
 }
 
 button,
@@ -77,15 +49,7 @@ select {
   font: inherit;
 }
 
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-select:focus-visible {
-  outline: 2px solid var(--accent-pine);
-  outline-offset: 2px;
-}
-
 ::selection {
-  background: rgba(24, 24, 27, 0.12);
-  color: var(--text-primary);
+  background: var(--zinc-200);
+  color: var(--zinc-900);
 }

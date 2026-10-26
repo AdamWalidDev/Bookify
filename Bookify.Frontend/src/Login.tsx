@@ -1,5 +1,4 @@
 import { useEffect, useState, type SubmitEvent } from 'react'
-import { ArrowRight, Building2 } from 'lucide-react'
 import { API_URL, setToken } from './api'
 
 type LoginProps = {
@@ -65,10 +64,11 @@ function Login({ onLogin }: LoginProps) {
 
   return (
     <div className="login-page">
-      <form className="login-card booking-form" onSubmit={handleSubmit}>
+      <form className="login-card" onSubmit={handleSubmit}>
         <div className="brand">
-          <span className="brand-mark"><Building2 size={18} /></span>
           <span className="brand-title">Bookify</span>
+          <span className="brand-divider" aria-hidden="true">/</span>
+          <span className="brand-badge">Workspace</span>
         </div>
 
         <div className="login-card-header">
@@ -100,7 +100,7 @@ function Login({ onLogin }: LoginProps) {
 
         {isSlowWakeup && !error && (
           <div className="wakeup-notice" role="status">
-            <span className="pulse-dot" />
+            <span className="status-dot dot-amber" />
             <span>Waking up the API server (free tier cold start takes ~25s)...</span>
           </div>
         )}
@@ -108,8 +108,7 @@ function Login({ onLogin }: LoginProps) {
         {error && <p className="form-message error-text" role="alert">{error}</p>}
 
         <button type="submit" className="create-button login-submit-button" disabled={isSubmitting}>
-          <span>{isSubmitting ? 'Signing in...' : 'Sign in'}</span>
-          <ArrowRight size={15} className="button-arrow" />
+          {isSubmitting ? 'Signing in...' : 'Sign in'}
         </button>
       </form>
     </div>

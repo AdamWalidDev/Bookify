@@ -3,45 +3,45 @@
   --font-display: 'Instrument Serif', Georgia, serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  --bg-canvas: #f5f4ef;
+  --bg-canvas: #fafafa;
   --bg-surface: #ffffff;
-  --bg-subtle: #efede6;
-  --bg-elevated: #faf9f5;
-  --bg-pine: #122b26;
-  --bg-pine-deep: #0c1f1b;
+  --bg-subtle: #f4f4f5;
+  --bg-elevated: #fafafa;
+  --bg-pine: #18181b;
+  --bg-pine-deep: #09090b;
 
-  --text-primary: #14211d;
-  --text-secondary: #52605a;
-  --text-muted: #76847d;
+  --text-primary: #09090b;
+  --text-secondary: #52525b;
+  --text-muted: #71717a;
 
-  --border-subtle: #e4e1d8;
-  --border-strong: #cfcac0;
+  --border-subtle: #e4e4e7;
+  --border-strong: #d4d4d8;
 
   --accent-terracotta: #b84a2c;
   --accent-terracotta-hover: #993b21;
   --accent-ochre: #e09f50;
-  --accent-pine: #173b34;
+  --accent-pine: #18181b;
 
-  --status-success-bg: #e6f4ec;
-  --status-success-text: #165b36;
-  --status-success-dot: #1f8a50;
+  --status-success-bg: #ecfdf5;
+  --status-success-text: #065f46;
+  --status-success-dot: #10b981;
 
-  --status-warning-bg: #fdf2df;
-  --status-warning-text: #8a520f;
-  --status-warning-dot: #d9821b;
+  --status-warning-bg: #fffbeb;
+  --status-warning-text: #92400e;
+  --status-warning-dot: #f59e0b;
 
-  --status-danger-bg: #fbeae7;
-  --status-danger-text: #943022;
-  --status-danger-dot: #cf4532;
+  --status-danger-bg: #fef2f2;
+  --status-danger-text: #991b1b;
+  --status-danger-dot: #ef4444;
 
-  --status-neutral-bg: #ebeeec;
-  --status-neutral-text: #3e4c46;
-  --status-neutral-dot: #6c7c75;
+  --status-neutral-bg: #f4f4f5;
+  --status-neutral-text: #3f3f46;
+  --status-neutral-dot: #71717a;
 
-  --shadow-xs: 0 1px 2px rgba(18, 43, 38, 0.04);
-  --shadow-sm: 0 2px 8px -2px rgba(18, 43, 38, 0.06), 0 1px 3px rgba(18, 43, 38, 0.04);
-  --shadow-md: 0 10px 26px -6px rgba(18, 43, 38, 0.09), 0 3px 8px -2px rgba(18, 43, 38, 0.05);
-  --shadow-lg: 0 22px 48px -12px rgba(18, 43, 38, 0.14), 0 4px 12px -2px rgba(18, 43, 38, 0.06);
+  --shadow-xs: 0 1px 2px rgba(9, 9, 11, 0.04);
+  --shadow-sm: 0 2px 8px -2px rgba(9, 9, 11, 0.06), 0 1px 3px rgba(9, 9, 11, 0.04);
+  --shadow-md: 0 10px 26px -6px rgba(9, 9, 11, 0.08), 0 3px 8px -2px rgba(9, 9, 11, 0.04);
+  --shadow-lg: 0 22px 48px -12px rgba(9, 9, 11, 0.12), 0 4px 12px -2px rgba(9, 9, 11, 0.05);
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
@@ -69,9 +69,6 @@ body {
   min-height: 100vh;
   margin: 0;
   background-color: var(--bg-canvas);
-  background-image:
-    radial-gradient(circle at 15% 0%, rgba(224, 159, 80, 0.07), transparent 38%),
-    radial-gradient(circle at 85% 0%, rgba(18, 43, 38, 0.05), transparent 42%);
 }
 
 button,
@@ -84,11 +81,11 @@ button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 select:focus-visible {
-  outline: 2px solid var(--accent-terracotta);
+  outline: 2px solid var(--accent-pine);
   outline-offset: 2px;
 }
 
 ::selection {
-  background: rgba(184, 74, 44, 0.16);
+  background: rgba(24, 24, 27, 0.12);
   color: var(--text-primary);
 }

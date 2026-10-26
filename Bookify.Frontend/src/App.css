@@ -155,8 +155,8 @@
 }
 
 .topbar-nav a[aria-current='page'] {
-  color: #122b26;
-  background: #f5f4ef;
+  color: #09090b;
+  background: #ffffff;
   font-weight: 600;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
@@ -528,7 +528,7 @@
 
 .add-resource-button:hover:not(:disabled) {
   background: var(--bg-elevated);
-  border-color: #9e988c;
+  border-color: #a1a1aa;
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
 }
@@ -778,7 +778,7 @@
   height: 220px;
   border-radius: 10px;
   border: 1px solid var(--border-subtle);
-  background: linear-gradient(90deg, #efede6 25%, #f8f7f3 50%, #efede6 75%);
+  background: linear-gradient(90deg, #f4f4f5 25%, #fafafa 50%, #f4f4f5 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
@@ -807,7 +807,7 @@
 }
 
 .resource-card-muted {
-  background: #faf9f6;
+  background: #fafafa;
 }
 
 .resource-card-top {
@@ -1109,7 +1109,7 @@
 }
 
 .booking-table tbody tr:hover {
-  background: #faf9f5;
+  background: #fafafa;
 }
 
 .booking-table tbody tr:last-child td {

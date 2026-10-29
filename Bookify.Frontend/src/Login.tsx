@@ -66,6 +66,7 @@ function Login({ onLogin }: LoginProps) {
     <div className="login-page">
       <form className="login-card" onSubmit={handleSubmit}>
         <div className="brand">
+          <img className="brand-mark" src="/bookify-mark.png" alt="" aria-hidden="true" />
           <span className="brand-title">Bookify</span>
           <span className="brand-divider" aria-hidden="true">/</span>
           <span className="brand-badge">Workspace</span>

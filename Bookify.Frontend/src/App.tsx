@@ -765,6 +765,7 @@ function App({ onLogout }: AppProps) {
         <div className="topbar-inner">
           <div className="topbar-left">
             <a className="brand" href="#resources" aria-label="Bookify home">
+              <img className="brand-mark" src="/bookify-mark.png" alt="" aria-hidden="true" />
               <span className="brand-title">Bookify</span>
               <span className="brand-divider" aria-hidden="true">/</span>
               <span className="brand-badge">Workspace</span>

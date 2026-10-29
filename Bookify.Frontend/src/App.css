@@ -406,7 +406,7 @@
 }
 
 .col-resource {
-  grid-column: span 5 / span 5;
+  grid-column: span 4 / span 4;
   min-width: 0;
 }
 
@@ -416,10 +416,11 @@
 
 .col-status {
   grid-column: span 2 / span 2;
+  min-width: 0;
 }
 
 .col-actions {
-  grid-column: span 3 / span 3;
+  grid-column: span 4 / span 4;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -428,7 +429,7 @@
 
 .resource-primary-line {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   min-width: 0;
 }
 
@@ -440,14 +441,29 @@
   font-variant-numeric: tabular-nums;
 }
 
+.resource-grid-row .resource-id {
+  flex-shrink: 0;
+  padding: 2px 6px;
+  border: 1px solid rgba(228, 228, 231, 0.8);
+  border-radius: 4px;
+  background: var(--zinc-100);
+  font-size: 11px;
+  line-height: 16px;
+}
+
 .resource-name {
+  min-width: 0;
   font-size: 14px;
   font-weight: 500;
   color: var(--zinc-900);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .resource-description {
   margin: 2px 0 0;
+  padding-left: 36px;
   font-size: 12px;
   color: var(--zinc-500);
   white-space: nowrap;
@@ -456,10 +472,29 @@
 }
 
 .capacity-text {
-  font-family: var(--font-mono);
+  display: inline-flex;
+  align-items: center;
+  column-gap: 4px;
+  font-family: var(--font-sans);
   font-size: 12px;
   color: var(--zinc-700);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.capacity-text svg {
+  flex-shrink: 0;
+  margin-right: 2px;
+  color: var(--zinc-400);
+}
+
+.capacity-value {
+  font-weight: 500;
+  color: var(--zinc-900);
+}
+
+.capacity-unit {
+  color: var(--zinc-500);
 }
 
 .inline-status {
@@ -469,6 +504,99 @@
   font-size: 12px;
   font-weight: 500;
   color: var(--zinc-700);
+}
+
+.resource-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border: 1px solid var(--zinc-200);
+  border-radius: 4px;
+  background: var(--zinc-50);
+  color: var(--zinc-700);
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.resource-status-badge.is-maintenance {
+  border-color: #fde68a;
+  background: rgba(255, 251, 235, 0.6);
+  color: #92400e;
+}
+
+.resource-status-detail {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--zinc-400);
+}
+
+.resource-book-button,
+.resource-availability-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  height: 28px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color 120ms ease,
+    background-color 120ms ease;
+}
+
+.resource-book-button {
+  padding: 0 10px;
+  border: 1px solid var(--zinc-200);
+  background: #ffffff;
+  color: var(--zinc-900);
+  font-weight: 500;
+}
+
+.resource-book-button:hover:not(:disabled) {
+  background: var(--zinc-50);
+}
+
+.resource-book-button:disabled {
+  color: var(--zinc-400);
+  cursor: not-allowed;
+}
+
+.resource-availability-button {
+  padding: 0 8px;
+  border: 0;
+  background: transparent;
+  color: var(--zinc-500);
+}
+
+.resource-availability-button:hover:not(:disabled) {
+  background: var(--zinc-100);
+  color: var(--zinc-900);
+}
+
+.resource-availability-button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.resource-table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  padding: 8px 16px;
+  border-top: 1px solid var(--zinc-200);
+  background: rgba(250, 250, 250, 0.6);
+  font-size: 11px;
+  color: var(--zinc-500);
+}
+
+.resource-table-count {
+  font-variant-numeric: tabular-nums;
 }
 
 .status-dot {

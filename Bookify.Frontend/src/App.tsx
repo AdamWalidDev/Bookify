@@ -7,6 +7,7 @@ import {
   RefreshCw,
   Search,
   Trash2,
+  Users,
   X,
 } from 'lucide-react'
 import './App.css'
@@ -913,79 +914,99 @@ function App({ onLogout }: AppProps) {
                   Try again
                 </button>
               </div>
-            ) : filteredResources.length === 0 ? (
-              <div className="data-list-container">
-                <div className="empty-state">No matching resources found.</div>
-              </div>
             ) : (
-              <div className="data-list-container" role="table" aria-label="Resources list">
-                <div className="resource-grid-header" role="row">
-                  <div className="col-resource" role="columnheader">Resource</div>
-                  <div className="col-capacity" role="columnheader">Capacity</div>
-                  <div className="col-status" role="columnheader">Status</div>
-                  <div className="col-actions" role="columnheader">Actions</div>
-                </div>
+              <div className="data-list-container">
+                <div role="table" aria-label="Resources list">
+                  <div className="resource-grid-header" role="row">
+                    <div className="col-resource" role="columnheader">Resource</div>
+                    <div className="col-capacity" role="columnheader">Capacity</div>
+                    <div className="col-status" role="columnheader">Status</div>
+                    <div className="col-actions" role="columnheader">Actions</div>
+                  </div>
 
-                <div className="data-list-body" role="rowgroup">
-                  {filteredResources.map((resource) => (
-                    <div className="resource-grid-row" role="row" key={resource.id}>
-                      <div className="col-resource" role="cell">
-                        <div className="resource-primary-line">
-                          <span className="resource-id">
-                            #{String(resource.id).padStart(2, '0')}
-                          </span>
-                          <span className="resource-name">{resource.name}</span>
+                  <div className="data-list-body" role="rowgroup">
+                    {filteredResources.length === 0 && (
+                      <div role="row">
+                        <div className="empty-state" role="cell" aria-colspan={4}>
+                          No matching resources found.
                         </div>
-                        <p className="resource-description">
-                          {resource.description || 'No description provided.'}
-                        </p>
                       </div>
+                    )}
+                    {filteredResources.map((resource) => (
+                      <div className="resource-grid-row" role="row" key={resource.id}>
+                        <div className="col-resource" role="cell">
+                          <div className="resource-primary-line">
+                            <span className="resource-id">
+                              #{String(resource.id).padStart(2, '0')}
+                            </span>
+                            <span className="resource-name" title={resource.name}>
+                              {resource.name}
+                            </span>
+                          </div>
+                          <p className="resource-description" title={resource.description}>
+                            {resource.description || 'No description provided.'}
+                          </p>
+                        </div>
 
-                      <div className="col-capacity" role="cell">
-                        <span className="capacity-text">Up to {resource.capacity} people</span>
-                      </div>
+                        <div className="col-capacity" role="cell">
+                          <span className="capacity-text">
+                            <Users size={14} aria-hidden="true" />
+                            <span className="capacity-value">{resource.capacity}</span>
+                            {' '}
+                            <span className="capacity-unit">
+                              {resource.capacity === 1 ? 'seat' : 'seats'}
+                            </span>
+                          </span>
+                        </div>
 
-                      <div className="col-status" role="cell">
-                        <span className="inline-status">
+                        <div className="col-status" role="cell">
                           <span
-                            className={`status-dot ${
-                              resource.isAvailable ? 'dot-emerald' : 'dot-amber'
-                            }`}
-                          />
-                          <span>{resource.isAvailable ? 'Available' : 'Maintenance'}</span>
-                        </span>
-                      </div>
+                            className={`resource-status-badge${resource.isAvailable ? '' : ' is-maintenance'}`}
+                          >
+                            {resource.isAvailable ? 'Available' : 'Maintenance'}
+                          </span>
+                          <span className="resource-status-detail">
+                            {resource.isAvailable ? 'Ready for instant booking' : 'Paused for maintenance'}
+                          </span>
+                        </div>
 
-                      <div className="col-actions" role="cell">
-                        <button
-                          type="button"
-                          className="row-btn-primary"
-                          onClick={() => handleQuickBookResource(resource)}
-                          disabled={!resource.isAvailable}
-                        >
-                          Book space
-                        </button>
-                        <button
-                          type="button"
-                          className="row-btn-secondary"
-                          onClick={() => void handleToggleResourceAvailability(resource)}
-                          disabled={resourceActionBusyId === resource.id}
-                        >
-                          {resource.isAvailable ? 'Pause' : 'Resume'}
-                        </button>
-                        <button
-                          type="button"
-                          className="row-btn-delete"
-                          onClick={() => void handleDeleteResource(resource)}
-                          disabled={resourceActionBusyId === resource.id}
-                          aria-label={`Delete ${resource.name}`}
-                          title="Delete resource"
-                        >
-                          <Trash2 size={14} />
-                        </button>
+                        <div className="col-actions" role="cell">
+                          <button
+                            type="button"
+                            className="resource-book-button"
+                            onClick={() => handleQuickBookResource(resource)}
+                            disabled={!resource.isAvailable}
+                          >
+                            Book space
+                          </button>
+                          <button
+                            type="button"
+                            className="resource-availability-button"
+                            onClick={() => void handleToggleResourceAvailability(resource)}
+                            disabled={resourceActionBusyId === resource.id}
+                          >
+                            {resource.isAvailable ? 'Pause' : 'Resume'}
+                          </button>
+                          <button
+                            type="button"
+                            className="row-btn-delete"
+                            onClick={() => void handleDeleteResource(resource)}
+                            disabled={resourceActionBusyId === resource.id}
+                            aria-label={`Delete ${resource.name}`}
+                            title="Delete resource"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                </div>
+                <div className="resource-table-footer">
+                  <span className="resource-table-count" role="status">
+                    Showing {filteredResources.length} of {resources.length} resources
+                  </span>
+                  <span>Real-time conflict checking active</span>
                 </div>
               </div>
             )}

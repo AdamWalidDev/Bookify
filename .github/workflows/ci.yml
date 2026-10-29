@@ -30,3 +30,14 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run build
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-test-results
+          path: Bookify.Frontend/test-results/
+          retention-days: 7

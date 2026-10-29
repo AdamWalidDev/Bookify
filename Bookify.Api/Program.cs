@@ -8,6 +8,7 @@ using Bookify.Infrastructure.Repositories;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.Sqlite;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 using Scalar.AspNetCore;
@@ -65,13 +66,25 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-var rawConnectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+var isEndToEndTest = builder.Environment.IsEnvironment("E2E");
+var rawConnectionString = isEndToEndTest
+	? "Data Source=bookify-e2e;Mode=Memory;Cache=Shared"
+	: builder.Configuration.GetConnectionString("DefaultConnection")
 	?? builder.Configuration["DATABASE_URL"]
 	?? throw new InvalidOperationException("Connection string 'DefaultConnection' or 'DATABASE_URL' is not configured.");
 
+// Keep a fresh, shared in-memory database alive for this test server's lifetime.
+// The E2E environment never opens the configured application database.
+using var testDatabase = isEndToEndTest ? new SqliteConnection(rawConnectionString) : null;
+testDatabase?.Open();
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-	if (IsPostgresConnectionString(rawConnectionString))
+	if (isEndToEndTest)
+	{
+		options.UseSqlite(rawConnectionString);
+	}
+	else if (IsPostgresConnectionString(rawConnectionString))
 	{
 		options.UseNpgsql(NormalizePostgresConnectionString(rawConnectionString));
 	}
@@ -112,7 +125,10 @@ if (app.Environment.IsDevelopment())
 	app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+if (!isEndToEndTest)
+{
+	app.UseHttpsRedirection();
+}
 
 app.UseCors("ReactFrontend");
 
@@ -165,6 +181,22 @@ static void SeedDemoDataIfEmpty(ApplicationDbContext dbContext)
 			Capacity = 40,
 			IsAvailable = false,
 			CreatedAt = now
+		},
+		new Resource
+		{
+			Name = "Project Room C",
+			Description = "Six-person project room with a whiteboard wall and wireless screen sharing.",
+			Capacity = 6,
+			IsAvailable = true,
+			CreatedAt = now
+		},
+		new Resource
+		{
+			Name = "Podcast Studio",
+			Description = "Acoustically treated studio with four microphones, headphones, and a recording desk.",
+			Capacity = 4,
+			IsAvailable = true,
+			CreatedAt = now
 		}
 	};
 
@@ -173,21 +205,21 @@ static void SeedDemoDataIfEmpty(ApplicationDbContext dbContext)
 		new Customer
 		{
 			Name = "Emma Lindqvist",
-			Email = "emma.lindqvist@nordicventures.se",
+			Email = "emma.lindqvist@example.com",
 			Phone = "+46 70 123 45 67",
 			CreatedAt = now
 		},
 		new Customer
 		{
 			Name = "Marcus Vance",
-			Email = "m.vance@atelierdesign.io",
+			Email = "marcus.vance@example.com",
 			Phone = "+1 (555) 234-8910",
 			CreatedAt = now
 		},
 		new Customer
 		{
 			Name = "Sofia Chen",
-			Email = "sofia.chen@krono-labs.com",
+			Email = "sofia.chen@example.com",
 			Phone = "+44 20 7946 0921",
 			CreatedAt = now
 		}
@@ -208,6 +240,33 @@ static void SeedDemoDataIfEmpty(ApplicationDbContext dbContext)
 			EndDate = tomorrow.AddHours(11),
 			Status = BookingStatus.Confirmed,
 			CreatedAt = now
+		},
+		new Booking
+		{
+			CustomerId = customers[0].Id,
+			ResourceId = resources[4].Id,
+			StartDate = tomorrow.AddHours(14),
+			EndDate = tomorrow.AddHours(15),
+			Status = BookingStatus.Pending,
+			CreatedAt = now
+		},
+		new Booking
+		{
+			CustomerId = customers[1].Id,
+			ResourceId = resources[5].Id,
+			StartDate = tomorrow.AddDays(2).AddHours(10),
+			EndDate = tomorrow.AddDays(2).AddHours(12),
+			Status = BookingStatus.Cancelled,
+			CreatedAt = now
+		},
+		new Booking
+		{
+			CustomerId = customers[2].Id,
+			ResourceId = resources[0].Id,
+			StartDate = now.Date.AddDays(-1).AddHours(9),
+			EndDate = now.Date.AddDays(-1).AddHours(11),
+			Status = BookingStatus.Completed,
+			CreatedAt = now.AddDays(-2)
 		},
 		new Booking
 		{

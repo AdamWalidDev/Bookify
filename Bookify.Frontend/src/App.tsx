@@ -1,4 +1,4 @@
-import { useEffect, useState, type SubmitEvent } from 'react'
+import { useEffect, useRef, useState, type SubmitEvent } from 'react'
 import {
   CalendarPlus,
   Check,
@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import './App.css'
 import { apiFetch } from './api'
+import { useBookingAvailability } from './useBookingAvailability'
 
 type Resource = {
   id: number
@@ -82,8 +83,12 @@ const getResponseMessage = async (response: Response) => {
   if (!body) return `Request failed (${response.status})`
 
   try {
-    const problem = JSON.parse(body) as { detail?: string; title?: string }
-    return problem.detail ?? problem.title ?? body
+    const problem = JSON.parse(body) as {
+      detail?: string
+      title?: string
+      errors?: Record<string, string[]>
+    }
+    return problem.detail ?? (problem.errors && Object.values(problem.errors).flat().join(' ')) ?? problem.title ?? body
   } catch {
     return body
   }
@@ -102,6 +107,8 @@ function App({ onLogout }: AppProps) {
   const [resourceFilter, setResourceFilter] = useState<'all' | 'available' | 'unavailable'>('all')
   const [resourceSearch, setResourceSearch] = useState('')
   const [isResourceFormOpen, setIsResourceFormOpen] = useState(false)
+  const [editingResourceId, setEditingResourceId] = useState<number | null>(null)
+  const resourceNameInput = useRef<HTMLInputElement>(null)
   const [resourceForm, setResourceForm] = useState({
     name: '',
     description: '',
@@ -125,6 +132,8 @@ function App({ onLogout }: AppProps) {
   const [customersReload, setCustomersReload] = useState(0)
   const [customerSearch, setCustomerSearch] = useState('')
   const [isCustomerFormOpen, setIsCustomerFormOpen] = useState(false)
+  const [editingCustomerId, setEditingCustomerId] = useState<number | null>(null)
+  const customerNameInput = useRef<HTMLInputElement>(null)
   const [customerForm, setCustomerForm] = useState<CreateCustomerForm>({
     name: '',
     email: '',
@@ -152,6 +161,27 @@ function App({ onLogout }: AppProps) {
   const [bookingActionError, setBookingActionError] = useState('')
   const [bookingActionSuccess, setBookingActionSuccess] = useState('')
   const [bookingActionInProgress, setBookingActionInProgress] = useState(false)
+
+  const availability = useBookingAvailability({
+    ...bookingForm,
+    revision: bookingsReload + reload,
+    enabled: activePage === 'bookings',
+  })
+  const editAvailability = useBookingAvailability({
+    ...editBookingForm,
+    resourceId: editingBooking ? String(editingBooking.resourceId) : '',
+    excludeBookingId: editingBooking?.id,
+    revision: bookingsReload + reload,
+    enabled: activePage === 'bookings' && editingBooking !== null,
+  })
+
+  useEffect(() => {
+    if (editingResourceId !== null) resourceNameInput.current?.focus()
+  }, [editingResourceId])
+
+  useEffect(() => {
+    if (editingCustomerId !== null) customerNameInput.current?.focus()
+  }, [editingCustomerId])
 
   useEffect(() => {
     const handleHashChange = () => setActivePage(getPageFromHash())
@@ -272,7 +302,22 @@ function App({ onLogout }: AppProps) {
     return () => controller.abort()
   }, [bookingsReload])
 
-  async function handleCreateCustomer(event: SubmitEvent<HTMLFormElement>) {
+  function closeCustomerForm() {
+    setIsCustomerFormOpen(false)
+    setEditingCustomerId(null)
+    setCustomerForm({ name: '', email: '', phone: '' })
+    setCustomerFormError('')
+  }
+
+  function startEditingCustomer(customer: Customer) {
+    setCustomerForm({ name: customer.name, email: customer.email, phone: customer.phone })
+    setEditingCustomerId(customer.id)
+    setCustomerFormError('')
+    setCustomerFormSuccess('')
+    setIsCustomerFormOpen(true)
+  }
+
+  async function handleSaveCustomer(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     setCustomerFormError('')
     setCustomerFormSuccess('')
@@ -285,31 +330,39 @@ function App({ onLogout }: AppProps) {
     setIsCreatingCustomer(true)
 
     try {
-      const response = await apiFetch('/api/customers', {
-        method: 'POST',
+      const payload = {
+        name: customerForm.name.trim(),
+        email: customerForm.email.trim(),
+        phone: customerForm.phone.trim(),
+      }
+      const response = await apiFetch(editingCustomerId === null ? '/api/customers' : `/api/customers/${editingCustomerId}`, {
+        method: editingCustomerId === null ? 'POST' : 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: customerForm.name.trim(),
-          email: customerForm.email.trim(),
-          phone: customerForm.phone.trim(),
-        }),
+        body: JSON.stringify(payload),
       })
 
       if (!response.ok) {
         throw new Error(await getResponseMessage(response))
       }
 
-      const customer = (await response.json()) as Customer
-      setCustomers((current) => [...current, customer])
-      setBookingForm((current) => ({ ...current, customerId: String(customer.id) }))
-      setCustomerForm({ name: '', email: '', phone: '' })
-      setIsCustomerFormOpen(false)
-      setCustomerFormSuccess(`${customer.name} added and selected for new bookings.`)
+      if (editingCustomerId === null) {
+        const customer = (await response.json()) as Customer
+        setCustomers((current) => [...current, customer])
+        setBookingForm((current) => ({ ...current, customerId: String(customer.id) }))
+        setCustomerFormSuccess(`${customer.name} added and selected for new bookings.`)
+      } else {
+        setCustomers((current) => current.map((customer) =>
+          customer.id === editingCustomerId ? { ...customer, ...payload } : customer,
+        ))
+        setBookingsReload((current) => current + 1)
+        setCustomerFormSuccess(`${payload.name} updated.`)
+      }
+      closeCustomerForm()
     } catch (submitError) {
       setCustomerFormError(
         submitError instanceof Error
           ? submitError.message
-          : 'Unable to add customer.',
+          : 'Unable to save customer.',
       )
     } finally {
       setIsCreatingCustomer(false)
@@ -340,7 +393,27 @@ function App({ onLogout }: AppProps) {
     }
   }
 
-  async function handleCreateResource(event: SubmitEvent<HTMLFormElement>) {
+  function closeResourceForm() {
+    setIsResourceFormOpen(false)
+    setEditingResourceId(null)
+    setResourceForm({ name: '', description: '', capacity: '8', isAvailable: true })
+    setResourceFormError('')
+  }
+
+  function startEditingResource(resource: Resource) {
+    setResourceForm({
+      name: resource.name,
+      description: resource.description,
+      capacity: String(resource.capacity),
+      isAvailable: resource.isAvailable,
+    })
+    setEditingResourceId(resource.id)
+    setResourceFormError('')
+    setResourceFormSuccess('')
+    setIsResourceFormOpen(true)
+  }
+
+  async function handleSaveResource(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     setResourceFormError('')
     setResourceFormSuccess('')
@@ -353,30 +426,31 @@ function App({ onLogout }: AppProps) {
     setIsCreatingResource(true)
 
     try {
-      const response = await apiFetch('/api/resources', {
-        method: 'POST',
+      const payload = {
+        name: resourceForm.name.trim(),
+        description: resourceForm.description.trim(),
+        capacity: Number(resourceForm.capacity),
+        isAvailable: resourceForm.isAvailable,
+      }
+      const response = await apiFetch(editingResourceId === null ? '/api/resources' : `/api/resources/${editingResourceId}`, {
+        method: editingResourceId === null ? 'POST' : 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: resourceForm.name.trim(),
-          description: resourceForm.description.trim(),
-          capacity: Number(resourceForm.capacity),
-          isAvailable: resourceForm.isAvailable,
-        }),
+        body: JSON.stringify(payload),
       })
 
       if (!response.ok) {
         throw new Error(await getResponseMessage(response))
       }
 
-      setResourceForm({ name: '', description: '', capacity: '8', isAvailable: true })
-      setIsResourceFormOpen(false)
-      setResourceFormSuccess('New resource added to the directory.')
+      closeResourceForm()
+      setResourceFormSuccess(editingResourceId === null ? 'New resource added to the directory.' : `${payload.name} updated.`)
       setReload((value) => value + 1)
+      if (editingResourceId !== null) setBookingsReload((value) => value + 1)
     } catch (submitError) {
       setResourceFormError(
         submitError instanceof Error
           ? submitError.message
-          : 'Unable to add resource.',
+          : 'Unable to save resource.',
       )
     } finally {
       setIsCreatingResource(false)
@@ -413,6 +487,7 @@ function App({ onLogout }: AppProps) {
       setResourceFormSuccess(
         `${resource.name} marked as ${nextAvailability ? 'available' : 'maintenance'}.`,
       )
+      setReload((value) => value + 1)
     } catch (toggleError) {
       setResourceFormError(
         toggleError instanceof Error ? toggleError.message : 'Unable to update resource.',
@@ -451,6 +526,11 @@ function App({ onLogout }: AppProps) {
     setCreateBookingError('')
     setCreateBookingSuccess('')
 
+    if (availability.status !== 'available') {
+      setCreateBookingError(availability.message)
+      return
+    }
+
     if (new Date(bookingForm.startDate) <= new Date()) {
       setCreateBookingError('The start time must be in the future.')
       return
@@ -476,6 +556,7 @@ function App({ onLogout }: AppProps) {
       })
 
       if (!response.ok) {
+        if (response.status === 409) availability.retry()
         throw new Error(await getResponseMessage(response))
       }
 
@@ -540,6 +621,11 @@ function App({ onLogout }: AppProps) {
     event.preventDefault()
     if (!editingBooking) return
 
+    if (editAvailability.status !== 'available') {
+      setBookingActionError(editAvailability.message)
+      return
+    }
+
     setBookingActionError('')
     setBookingActionSuccess('')
     setBookingActionInProgress(true)
@@ -555,7 +641,10 @@ function App({ onLogout }: AppProps) {
         }),
       })
 
-      if (!response.ok) throw new Error(await getResponseMessage(response))
+      if (!response.ok) {
+        if (response.status === 409) editAvailability.retry()
+        throw new Error(await getResponseMessage(response))
+      }
 
       setEditingBooking(null)
       setBookingActionSuccess(`Booking #${editingBooking.id} updated.`)
@@ -813,10 +902,12 @@ function App({ onLogout }: AppProps) {
                   className="add-resource-button"
                   type="button"
                   onClick={() => {
-                    setIsResourceFormOpen((open) => !open)
+                    if (isResourceFormOpen) closeResourceForm()
+                    else setIsResourceFormOpen(true)
                     setResourceFormError('')
                     setResourceFormSuccess('')
                   }}
+                  disabled={isCreatingResource}
                   aria-expanded={isResourceFormOpen}
                   aria-controls="resource-create-form"
                 >
@@ -842,11 +933,15 @@ function App({ onLogout }: AppProps) {
               <form
                 id="resource-create-form"
                 className="resource-form"
-                onSubmit={handleCreateResource}
+                aria-label={editingResourceId === null ? 'Add resource' : 'Edit resource'}
+                onSubmit={handleSaveResource}
               >
+                {editingResourceId !== null && <h3 className="directory-form-title">Edit resource</h3>}
                 <label>
                   Room name
                   <input
+                    ref={resourceNameInput}
+                    disabled={isCreatingResource}
                     required
                     maxLength={100}
                     value={resourceForm.name}
@@ -859,6 +954,7 @@ function App({ onLogout }: AppProps) {
                 <label>
                   Description
                   <input
+                    disabled={isCreatingResource}
                     maxLength={500}
                     value={resourceForm.description}
                     onChange={(event) =>
@@ -870,10 +966,11 @@ function App({ onLogout }: AppProps) {
                 <label>
                   Capacity
                   <input
+                    disabled={isCreatingResource}
                     required
                     type="number"
                     min="1"
-                    max="10000"
+                    max="1000"
                     value={resourceForm.capacity}
                     onChange={(event) =>
                       setResourceForm((current) => ({ ...current, capacity: event.target.value }))
@@ -883,6 +980,7 @@ function App({ onLogout }: AppProps) {
                 <label className="availability-field">
                   <input
                     type="checkbox"
+                    disabled={isCreatingResource}
                     checked={resourceForm.isAvailable}
                     onChange={(event) =>
                       setResourceForm((current) => ({
@@ -895,10 +993,15 @@ function App({ onLogout }: AppProps) {
                 </label>
                 <div className="resource-form-footer">
                   <p className="form-message error-text" role="alert">{resourceFormError}</p>
-                  <button className="create-button" type="submit" disabled={isCreatingResource}>
-                    <Plus size={14} />
-                    {isCreatingResource ? 'Saving...' : 'Save resource'}
-                  </button>
+                  <div className="directory-form-actions">
+                    <button type="button" className="row-btn-secondary" onClick={closeResourceForm} disabled={isCreatingResource}>
+                      Cancel
+                    </button>
+                    <button className="create-button" type="submit" disabled={isCreatingResource}>
+                      {editingResourceId === null ? <Plus size={14} /> : <Check size={14} />}
+                      {isCreatingResource ? 'Saving...' : editingResourceId === null ? 'Save resource' : 'Save changes'}
+                    </button>
+                  </div>
                 </div>
               </form>
             )}
@@ -982,8 +1085,17 @@ function App({ onLogout }: AppProps) {
                           <button
                             type="button"
                             className="resource-availability-button"
+                            onClick={() => startEditingResource(resource)}
+                            disabled={isCreatingResource || resourceActionBusyId !== null}
+                            aria-label={`Edit ${resource.name}`}
+                          >
+                            <Pencil size={12} aria-hidden="true" /> Edit
+                          </button>
+                          <button
+                            type="button"
+                            className="resource-availability-button"
                             onClick={() => void handleToggleResourceAvailability(resource)}
-                            disabled={resourceActionBusyId === resource.id}
+                            disabled={resourceActionBusyId !== null || isCreatingResource || editingResourceId === resource.id}
                           >
                             {resource.isAvailable ? 'Pause' : 'Resume'}
                           </button>
@@ -991,7 +1103,7 @@ function App({ onLogout }: AppProps) {
                             type="button"
                             className="row-btn-delete"
                             onClick={() => void handleDeleteResource(resource)}
-                            disabled={resourceActionBusyId === resource.id}
+                            disabled={resourceActionBusyId !== null || isCreatingResource || editingResourceId === resource.id}
                             aria-label={`Delete ${resource.name}`}
                             title="Delete resource"
                           >
@@ -1046,10 +1158,12 @@ function App({ onLogout }: AppProps) {
                   className="add-resource-button"
                   type="button"
                   onClick={() => {
-                    setIsCustomerFormOpen((open) => !open)
+                    if (isCustomerFormOpen) closeCustomerForm()
+                    else setIsCustomerFormOpen(true)
                     setCustomerFormError('')
                     setCustomerFormSuccess('')
                   }}
+                  disabled={isCreatingCustomer}
                   aria-expanded={isCustomerFormOpen}
                   aria-controls="customer-create-form"
                 >
@@ -1075,13 +1189,17 @@ function App({ onLogout }: AppProps) {
               <form
                 id="customer-create-form"
                 className="customer-form"
-                onSubmit={handleCreateCustomer}
+                aria-label={editingCustomerId === null ? 'Add customer' : 'Edit customer'}
+                onSubmit={handleSaveCustomer}
               >
+                {editingCustomerId !== null && <h3 className="directory-form-title">Edit customer</h3>}
                 <label>
                   Name
                   <input
+                    ref={customerNameInput}
+                    disabled={isCreatingCustomer}
                     required
-                    maxLength={200}
+                    maxLength={100}
                     autoComplete="name"
                     value={customerForm.name}
                     onChange={(event) =>
@@ -1093,9 +1211,10 @@ function App({ onLogout }: AppProps) {
                 <label>
                   Email
                   <input
+                    disabled={isCreatingCustomer}
                     required
                     type="email"
-                    maxLength={320}
+                    maxLength={100}
                     autoComplete="email"
                     value={customerForm.email}
                     onChange={(event) =>
@@ -1107,8 +1226,9 @@ function App({ onLogout }: AppProps) {
                 <label>
                   Phone <span className="optional-label">(optional)</span>
                   <input
+                    disabled={isCreatingCustomer}
                     type="tel"
-                    maxLength={50}
+                    maxLength={20}
                     autoComplete="tel"
                     value={customerForm.phone}
                     onChange={(event) =>
@@ -1119,10 +1239,15 @@ function App({ onLogout }: AppProps) {
                 </label>
                 <div className="customer-form-footer">
                   <p className="form-message error-text" role="alert">{customerFormError}</p>
-                  <button className="create-button" type="submit" disabled={isCreatingCustomer}>
-                    <Plus size={14} />
-                    {isCreatingCustomer ? 'Saving...' : 'Save customer'}
-                  </button>
+                  <div className="directory-form-actions">
+                    <button type="button" className="row-btn-secondary" onClick={closeCustomerForm} disabled={isCreatingCustomer}>
+                      Cancel
+                    </button>
+                    <button className="create-button" type="submit" disabled={isCreatingCustomer}>
+                      {editingCustomerId === null ? <Plus size={14} /> : <Check size={14} />}
+                      {isCreatingCustomer ? 'Saving...' : editingCustomerId === null ? 'Save customer' : 'Save changes'}
+                    </button>
+                  </div>
                 </div>
               </form>
             )}
@@ -1175,9 +1300,18 @@ function App({ onLogout }: AppProps) {
                             </button>
                             <button
                               type="button"
+                              className="row-btn-secondary"
+                              onClick={() => startEditingCustomer(customer)}
+                              disabled={isCreatingCustomer || customerActionBusyId !== null}
+                              aria-label={`Edit ${customer.name}`}
+                            >
+                              <Pencil size={12} aria-hidden="true" /> Edit
+                            </button>
+                            <button
+                              type="button"
                               className="row-btn-delete"
                               onClick={() => void handleDeleteCustomer(customer)}
-                              disabled={customerActionBusyId === customer.id}
+                              disabled={customerActionBusyId !== null || isCreatingCustomer || editingCustomerId === customer.id}
                               aria-label={`Delete ${customer.name}`}
                               title="Remove customer"
                             >
@@ -1237,7 +1371,7 @@ function App({ onLogout }: AppProps) {
                 </div>
               </div>
             ) : (
-              <form className="booking-form" onSubmit={handleCreateBooking}>
+              <form className="booking-form" aria-label="New reservation" onSubmit={handleCreateBooking}>
                 <label>
                   Customer
                   <select
@@ -1302,6 +1436,15 @@ function App({ onLogout }: AppProps) {
                 </label>
 
                 <div className="booking-form-footer">
+                  <div className={`booking-availability availability-${availability.status}`} role="status" aria-label="Reservation availability" aria-live="polite">
+                    <span>{availability.message}</span>
+                    {availability.status === 'error' && (
+                      <button type="button" className="row-btn-secondary" onClick={availability.retry}>Try again</button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="booking-form-footer">
                   <div aria-live="polite">
                     {createBookingError && (
                       <p className="form-message error-text" role="alert">{createBookingError}</p>
@@ -1312,7 +1455,7 @@ function App({ onLogout }: AppProps) {
                       </p>
                     )}
                   </div>
-                  <button className="create-button" type="submit" disabled={isCreatingBooking}>
+                  <button className="create-button" type="submit" disabled={isCreatingBooking || availability.status !== 'available'}>
                     <Plus size={14} />
                     {isCreatingBooking ? 'Scheduling...' : 'Create booking'}
                   </button>
@@ -1367,6 +1510,7 @@ function App({ onLogout }: AppProps) {
             {editingBooking && (
               <form
                 className="booking-form booking-edit-form"
+                aria-label="Edit booking"
                 onSubmit={handleUpdateBooking}
               >
                 <div className="booking-create-heading booking-edit-heading">
@@ -1413,8 +1557,17 @@ function App({ onLogout }: AppProps) {
                   />
                 </label>
                 <div className="booking-form-footer">
+                  <div className={`booking-availability availability-${editAvailability.status}`} role="status" aria-label="Booking edit availability" aria-live="polite">
+                    <span>{editAvailability.message}</span>
+                    {editAvailability.status === 'error' && (
+                      <button type="button" className="row-btn-secondary" onClick={editAvailability.retry}>Try again</button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="booking-form-footer">
                   <span className="form-message">Status: <strong>{editingBooking.status}</strong></span>
-                  <button className="create-button" type="submit" disabled={bookingActionInProgress}>
+                  <button className="create-button" type="submit" disabled={bookingActionInProgress || editAvailability.status !== 'available'}>
                     <Check size={14} />
                     {bookingActionInProgress ? 'Saving...' : 'Save changes'}
                   </button>

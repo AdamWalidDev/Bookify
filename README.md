@@ -18,8 +18,9 @@ Bookify.Api/
 
 ## Features
 
-- Add and view resources and customers.
+- Add, view, and edit resources and customers; pause spaces for maintenance.
 - Create bookings and check for overlapping bookings.
+- Check availability as the selected space or time changes, with conflict feedback before submission and a retry option if the check fails.
 - Edit booking dates, confirm, cancel, complete, and delete bookings.
 - Unavailable resources cannot be booked.
 - Pending and confirmed bookings reserve their time slots. Cancelled and completed bookings do not.
@@ -87,3 +88,22 @@ dotnet test Bookify.Api.Tests/Bookify.Api.Tests.csproj
 ```
 
 The tests use a temporary SQLite database and do not require SQL Server LocalDB.
+
+## Browser tests
+
+From `Bookify.Frontend`, run:
+
+```powershell
+npm ci
+npm run test:e2e
+```
+
+The suite starts its own frontend on `127.0.0.1:4179` and API on `127.0.0.1:5189`. The API runs in the `E2E` environment with a fresh, shared in-memory SQLite database and test credentials. It never opens your configured application database, and all test data disappears when that API process exits. Existing servers on those ports cause a failure rather than being reused.
+
+Windows uses the installed Google Chrome by default. On other systems, install Chromium first with `npx playwright install chromium`. Set `PLAYWRIGHT_CHANNEL` to select another installed Playwright browser channel. CI installs Chromium and runs the suite automatically.
+
+Coverage includes creating a reservation, rejecting an overlapping request in both the browser and API, cancelling and rebooking the released slot, editing a booking without conflicting with itself, saving resource and customer edits, recovering from duplicate emails, and retrying a failed availability check. Failure screenshots and traces are saved under `Bookify.Frontend/test-results/`.
+
+## Demo data
+
+An empty database is initialized with six spaces, three fictional customers using `example.com` emails, and six reservations covering pending, confirmed, cancelled, and completed states. Future reservations are relative to startup. Existing databases are left unchanged; demo seeding is skipped if resources or customers already exist.

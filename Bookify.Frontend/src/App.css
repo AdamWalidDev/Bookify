@@ -27,7 +27,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: var(--zinc-50);
+  background: var(--page-canvas);
   color: var(--zinc-900);
 }
 
@@ -1066,7 +1066,7 @@
   display: grid;
   place-items: center;
   padding: 24px;
-  background: var(--zinc-50);
+  background: var(--page-canvas);
 }
 
 .login-card {

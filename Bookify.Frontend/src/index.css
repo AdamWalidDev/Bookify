@@ -13,14 +13,20 @@
   --border-default: #e7e5e4;
   --border-strong: #d6d3d1;
   --brand-primary: #15803d;
+  --brand-primary-hover: #166534;
+  --brand-primary-active: #14532d;
+  --text-on-brand: #ffffff;
   --brand-soft: #eaf7ee;
   --nav-selected-surface: #fff0e6;
   --nav-selected-text: #c2410c;
 
-  /* Existing action and status colors; control styling follows separately. */
+  /* Shared control appearance. */
+  --control-radius: 8px;
+  --control-border: #8c837b;
+  --focus-ring: var(--brand-primary);
+
+  /* Status colors. */
   --zinc-400: #a1a1aa;
-  --zinc-800: #27272a;
-  --zinc-900: #18181b;
 
   --emerald-500: #10b981;
   --emerald-600: #059669;

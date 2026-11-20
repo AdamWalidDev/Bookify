@@ -20,6 +20,58 @@
   text-align: right !important;
 }
 
+/* Shared button appearance and keyboard focus. */
+button {
+  border-radius: var(--control-radius);
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
+}
+
+.schedule-slot-btn,
+.create-button,
+.row-btn-primary {
+  background: var(--brand-primary);
+  color: var(--text-on-brand);
+}
+
+.schedule-slot-btn:hover:not(:disabled),
+.create-button:hover:not(:disabled),
+.row-btn-primary:hover:not(:disabled) {
+  background: var(--brand-primary-hover);
+}
+
+.schedule-slot-btn:active:not(:disabled),
+.create-button:active:not(:disabled),
+.row-btn-primary:active:not(:disabled) {
+  background: var(--brand-primary-active);
+}
+
+.icon-button:hover:not(:disabled),
+.add-resource-button:hover:not(:disabled),
+.resource-book-button:hover:not(:disabled),
+.row-btn-secondary:hover:not(:disabled),
+.preset-chip:hover:not(:disabled),
+.error-message button:hover:not(:disabled) {
+  border-color: var(--brand-primary);
+  background: var(--brand-soft);
+  color: var(--brand-primary);
+}
+
+.signout-button:hover:not(:disabled),
+.resource-availability-button:hover:not(:disabled) {
+  background: var(--brand-soft);
+  color: var(--brand-primary);
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
 /* ==========================================================================
    A. Compact Top Navigation Bar
    ========================================================================== */
@@ -134,17 +186,9 @@
   height: 32px;
   padding: 0 12px;
   border: 0;
-  border-radius: 6px;
-  background: var(--zinc-900);
-  color: #ffffff;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 120ms ease;
-}
-
-.schedule-slot-btn:hover {
-  background: var(--zinc-800);
 }
 
 .signout-button {
@@ -156,11 +200,6 @@
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: color 120ms ease;
-}
-
-.signout-button:hover {
-  color: var(--text-primary);
 }
 
 /* ==========================================================================
@@ -271,8 +310,8 @@
   height: 32px;
   width: 256px;
   padding: 0 10px 0 30px;
-  border: 1px solid var(--border-default);
-  border-radius: 6px;
+  border: 1px solid var(--control-border);
+  border-radius: var(--control-radius);
   background: var(--surface);
   color: var(--text-primary);
   font-size: 12px;
@@ -284,15 +323,14 @@
 }
 
 .search-box input:focus {
-  outline: none;
-  border-color: var(--zinc-400);
+  border-color: var(--brand-primary);
 }
 
 .segmented-control {
   display: inline-flex;
   align-items: center;
   padding: 2px;
-  border-radius: 6px;
+  border-radius: var(--control-radius);
   background: var(--surface-subtle);
 }
 
@@ -300,26 +338,22 @@
   height: 28px;
   padding: 0 10px;
   border: 1px solid transparent;
-  border-radius: 4px;
   background: transparent;
   color: var(--text-secondary);
   font-size: 12px;
   font-weight: 400;
   cursor: pointer;
-  transition:
-    color 120ms ease,
-    background-color 120ms ease;
 }
 
-.segmented-control button:hover {
+.segmented-control button:hover:not(:disabled) {
   color: var(--text-primary);
 }
 
-.segmented-control button.active {
-  background: var(--surface);
-  color: var(--text-primary);
+.segmented-control button.active:not(:disabled) {
+  background: var(--brand-soft);
+  color: var(--brand-primary);
   font-weight: 500;
-  border-color: var(--border-default);
+  border-color: var(--brand-primary);
 }
 
 .icon-button {
@@ -328,22 +362,10 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  border: 1px solid var(--border-default);
-  border-radius: 6px;
+  border: 1px solid var(--border-strong);
   background: var(--surface);
   color: var(--text-secondary);
   cursor: pointer;
-  transition: background-color 120ms ease;
-}
-
-.icon-button:hover:not(:disabled) {
-  background: var(--surface-muted);
-  color: var(--text-primary);
-}
-
-.icon-button:disabled {
-  cursor: wait;
-  opacity: 0.5;
 }
 
 .icon-button.is-spinning svg {
@@ -357,18 +379,12 @@
   gap: 6px;
   height: 32px;
   padding: 0 12px;
-  border: 1px solid var(--border-default);
-  border-radius: 6px;
+  border: 1px solid var(--border-strong);
   background: var(--surface);
   color: var(--text-primary);
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 120ms ease;
-}
-
-.add-resource-button:hover:not(:disabled) {
-  background: var(--surface-muted);
 }
 
 /* ==========================================================================
@@ -548,30 +564,17 @@
   justify-content: center;
   flex-shrink: 0;
   height: 28px;
-  border-radius: 4px;
   font-size: 12px;
   white-space: nowrap;
   cursor: pointer;
-  transition:
-    color 120ms ease,
-    background-color 120ms ease;
 }
 
 .resource-book-button {
   padding: 0 10px;
-  border: 1px solid var(--border-default);
+  border: 1px solid var(--border-strong);
   background: var(--surface);
   color: var(--text-primary);
   font-weight: 500;
-}
-
-.resource-book-button:hover:not(:disabled) {
-  background: var(--surface-muted);
-}
-
-.resource-book-button:disabled {
-  color: var(--text-muted);
-  cursor: not-allowed;
 }
 
 .resource-availability-button {
@@ -579,16 +582,6 @@
   border: 0;
   background: transparent;
   color: var(--text-secondary);
-}
-
-.resource-availability-button:hover:not(:disabled) {
-  background: var(--surface-subtle);
-  color: var(--text-primary);
-}
-
-.resource-availability-button:disabled {
-  opacity: 0.5;
-  cursor: wait;
 }
 
 .resource-table-footer {
@@ -639,23 +632,9 @@
   height: 28px;
   padding: 0 10px;
   border: 0;
-  border-radius: 4px;
-  background: var(--zinc-900);
-  color: #ffffff;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 120ms ease;
-}
-
-.row-btn-primary:hover:not(:disabled) {
-  background: var(--zinc-800);
-}
-
-.row-btn-primary:disabled {
-  background: var(--surface-subtle);
-  color: var(--text-muted);
-  cursor: not-allowed;
 }
 
 .row-btn-secondary {
@@ -665,23 +644,12 @@
   gap: 5px;
   height: 28px;
   padding: 0 8px;
-  border: 1px solid var(--border-default);
-  border-radius: 4px;
+  border: 1px solid var(--border-strong);
   background: var(--surface);
   color: var(--text-secondary);
   font-size: 12px;
   font-weight: 400;
   cursor: pointer;
-  transition: background-color 120ms ease;
-}
-
-.row-btn-secondary:hover:not(:disabled) {
-  background: var(--surface-subtle);
-}
-
-.row-btn-secondary:disabled {
-  opacity: 0.5;
-  cursor: wait;
 }
 
 .row-btn-delete {
@@ -691,23 +659,14 @@
   width: 28px;
   height: 28px;
   border: 0;
-  border-radius: 4px;
   background: transparent;
   color: var(--text-muted);
   cursor: pointer;
-  transition:
-    color 120ms ease,
-    background-color 120ms ease;
 }
 
 .row-btn-delete:hover:not(:disabled) {
   color: var(--rose-600);
   background: var(--rose-50);
-}
-
-.row-btn-delete:disabled {
-  opacity: 0.5;
-  cursor: wait;
 }
 
 .empty-state {
@@ -810,8 +769,8 @@
   min-width: 0;
   height: 32px;
   padding: 0 10px;
-  border: 1px solid var(--border-default);
-  border-radius: 6px;
+  border: 1px solid var(--control-border);
+  border-radius: var(--control-radius);
   color: var(--text-primary);
   background: var(--surface);
   font-size: 12px;
@@ -823,8 +782,7 @@
 .resource-form input:focus,
 .customer-form input:focus,
 .login-card input:focus {
-  outline: none;
-  border-color: var(--zinc-400);
+  border-color: var(--brand-primary);
 }
 
 .resource-form .availability-field {
@@ -839,7 +797,7 @@
 .availability-field input {
   width: 14px;
   height: 14px;
-  accent-color: var(--zinc-900);
+  accent-color: var(--brand-primary);
 }
 
 .optional-label {
@@ -867,23 +825,9 @@
   height: 32px;
   padding: 0 12px;
   border: 0;
-  border-radius: 6px;
-  background: var(--zinc-900);
-  color: #ffffff;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 120ms ease;
-}
-
-.create-button:hover:not(:disabled) {
-  background: var(--zinc-800);
-}
-
-.create-button:disabled {
-  background: var(--surface-subtle);
-  color: var(--text-muted);
-  cursor: wait;
 }
 
 .form-message {
@@ -950,19 +894,12 @@
 .preset-chip {
   height: 24px;
   padding: 0 8px;
-  border: 1px solid var(--border-default);
-  border-radius: 4px;
+  border: 1px solid var(--border-strong);
   background: var(--surface);
   color: var(--text-secondary);
   font-family: var(--font-mono);
   font-size: 11px;
   cursor: pointer;
-  transition: background-color 120ms ease;
-}
-
-.preset-chip:hover {
-  background: var(--surface-subtle);
-  color: var(--text-primary);
 }
 
 .booking-table-wrap {
@@ -1050,8 +987,7 @@
 .error-message button {
   height: 28px;
   padding: 0 10px;
-  border: 1px solid var(--border-default);
-  border-radius: 4px;
+  border: 1px solid var(--border-strong);
   background: var(--surface);
   color: var(--text-primary);
   font-size: 12px;
@@ -1110,6 +1046,29 @@
 .login-submit-button {
   width: 100%;
   margin-top: 2px;
+}
+
+/* Disabled controls remain readable and do not adopt hover styles. */
+button:disabled,
+input:disabled,
+.resource-form label > input:not([type='checkbox']):disabled,
+select:disabled {
+  border-color: var(--border-default);
+  background: var(--surface-subtle);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button,
+  .search-box input,
+  .booking-form input,
+  .booking-form select,
+  .resource-form label > input:not([type='checkbox']),
+  .customer-form input,
+  .login-card input {
+    transition: none;
+  }
 }
 
 /* ==========================================================================

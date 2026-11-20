@@ -28,13 +28,13 @@
   display: flex;
   flex-direction: column;
   background: var(--page-canvas);
-  color: var(--zinc-900);
+  color: var(--text-primary);
 }
 
 .topbar {
   height: 56px;
-  background: #ffffff;
-  border-bottom: 1px solid var(--zinc-200);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-default);
   padding: 0 24px;
 }
 
@@ -72,12 +72,12 @@
 .brand-title {
   font-size: 14px;
   font-weight: 600;
-  color: var(--zinc-900);
+  color: var(--brand-primary);
   letter-spacing: -0.025em;
 }
 
 .brand-divider {
-  color: var(--zinc-300);
+  color: var(--border-strong);
   font-size: 13px;
   user-select: none;
 }
@@ -85,7 +85,7 @@
 .brand-badge {
   font-size: 12px;
   font-weight: 400;
-  color: var(--zinc-500);
+  color: var(--text-secondary);
 }
 
 .topbar-nav {
@@ -103,7 +103,7 @@
   margin-bottom: -1px;
   font-size: 14px;
   font-weight: 500;
-  color: var(--zinc-500);
+  color: var(--text-secondary);
   text-decoration: none;
   transition:
     color 120ms ease,
@@ -111,12 +111,13 @@
 }
 
 .topbar-nav a:hover {
-  color: var(--zinc-800);
+  color: var(--text-primary);
 }
 
 .topbar-nav a[aria-current='page'] {
-  color: var(--zinc-900);
-  border-bottom-color: var(--zinc-900);
+  background: var(--nav-selected-surface);
+  color: var(--nav-selected-text);
+  border-bottom-color: var(--nav-selected-text);
 }
 
 .topbar-right {
@@ -151,7 +152,7 @@
   padding: 0 6px;
   border: 0;
   background: transparent;
-  color: var(--zinc-500);
+  color: var(--text-secondary);
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
@@ -159,7 +160,7 @@
 }
 
 .signout-button:hover {
-  color: var(--zinc-900);
+  color: var(--text-primary);
 }
 
 /* ==========================================================================
@@ -179,14 +180,14 @@
   flex-wrap: wrap;
   gap: 16px;
   padding: 20px 0;
-  border-bottom: 1px solid var(--zinc-200);
+  border-bottom: 1px solid var(--border-default);
 }
 
 .page-heading h1 {
   margin: 0;
   font-size: 18px;
   font-weight: 600;
-  color: var(--zinc-900);
+  color: var(--text-primary);
   letter-spacing: -0.025em;
   line-height: 1.3;
 }
@@ -194,7 +195,7 @@
 .page-description {
   margin: 2px 0 0;
   font-size: 12px;
-  color: var(--zinc-500);
+  color: var(--text-secondary);
 }
 
 .telemetry-strip {
@@ -203,10 +204,10 @@
   flex-wrap: wrap;
   gap: 16px;
   padding: 6px 12px;
-  border: 1px solid var(--zinc-200);
+  border: 1px solid var(--border-default);
   border-radius: 6px;
-  background: var(--zinc-50);
-  color: var(--zinc-600);
+  background: var(--brand-soft);
+  color: var(--text-secondary);
   font-size: 12px;
   font-variant-numeric: tabular-nums;
 }
@@ -214,11 +215,11 @@
 .telemetry-strip strong {
   font-family: var(--font-mono);
   font-weight: 500;
-  color: var(--zinc-900);
+  color: var(--text-primary);
 }
 
 .telemetry-dot {
-  color: var(--zinc-300);
+  color: var(--border-strong);
   user-select: none;
 }
 
@@ -250,7 +251,7 @@
   margin: 0 8px 0 0;
   font-size: 14px;
   font-weight: 600;
-  color: var(--zinc-900);
+  color: var(--text-primary);
 }
 
 .search-box {
@@ -262,7 +263,7 @@
 .search-box svg {
   position: absolute;
   left: 10px;
-  color: var(--zinc-400);
+  color: var(--text-muted);
   pointer-events: none;
 }
 
@@ -270,16 +271,16 @@
   height: 32px;
   width: 256px;
   padding: 0 10px 0 30px;
-  border: 1px solid var(--zinc-200);
+  border: 1px solid var(--border-default);
   border-radius: 6px;
-  background: #ffffff;
-  color: var(--zinc-900);
+  background: var(--surface);
+  color: var(--text-primary);
   font-size: 12px;
   transition: border-color 120ms ease;
 }
 
 .search-box input::placeholder {
-  color: var(--zinc-400);
+  color: var(--text-muted);
 }
 
 .search-box input:focus {
@@ -292,7 +293,7 @@
   align-items: center;
   padding: 2px;
   border-radius: 6px;
-  background: var(--zinc-100);
+  background: var(--surface-subtle);
 }
 
 .segmented-control button {
@@ -301,7 +302,7 @@
   border: 1px solid transparent;
   border-radius: 4px;
   background: transparent;
-  color: var(--zinc-600);
+  color: var(--text-secondary);
   font-size: 12px;
   font-weight: 400;
   cursor: pointer;
@@ -311,14 +312,14 @@
 }
 
 .segmented-control button:hover {
-  color: var(--zinc-900);
+  color: var(--text-primary);
 }
 
 .segmented-control button.active {
-  background: #ffffff;
-  color: var(--zinc-900);
+  background: var(--surface);
+  color: var(--text-primary);
   font-weight: 500;
-  border-color: rgba(228, 228, 231, 0.8);
+  border-color: var(--border-default);
 }
 
 .icon-button {
@@ -327,17 +328,17 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  border: 1px solid var(--zinc-200);
+  border: 1px solid var(--border-default);
   border-radius: 6px;
-  background: #ffffff;
-  color: var(--zinc-600);
+  background: var(--surface);
+  color: var(--text-secondary);
   cursor: pointer;
   transition: background-color 120ms ease;
 }
 
 .icon-button:hover:not(:disabled) {
-  background: var(--zinc-50);
-  color: var(--zinc-900);
+  background: var(--surface-muted);
+  color: var(--text-primary);
 }
 
 .icon-button:disabled {
@@ -356,10 +357,10 @@
   gap: 6px;
   height: 32px;
   padding: 0 12px;
-  border: 1px solid var(--zinc-200);
+  border: 1px solid var(--border-default);
   border-radius: 6px;
-  background: #ffffff;
-  color: var(--zinc-900);
+  background: var(--surface);
+  color: var(--text-primary);
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
@@ -367,15 +368,15 @@
 }
 
 .add-resource-button:hover:not(:disabled) {
-  background: var(--zinc-50);
+  background: var(--surface-muted);
 }
 
 /* ==========================================================================
    D. Structured 12-Column Data List (Resources & Spaces)
    ========================================================================== */
 .data-list-container {
-  background: #ffffff;
-  border: 1px solid var(--zinc-200);
+  background: var(--surface);
+  border: 1px solid var(--border-default);
   border-radius: 6px;
   overflow: hidden;
 }
@@ -386,17 +387,17 @@
   gap: 16px;
   align-items: center;
   padding: 8px 16px;
-  background: rgba(250, 250, 250, 0.8);
-  border-bottom: 1px solid var(--zinc-200);
+  background: var(--surface-muted);
+  border-bottom: 1px solid var(--border-default);
   font-size: 11px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--zinc-500);
+  color: var(--text-secondary);
 }
 
 .data-list-body > .resource-grid-row + .resource-grid-row {
-  border-top: 1px solid var(--zinc-200);
+  border-top: 1px solid var(--border-default);
 }
 
 .resource-grid-row {
@@ -409,7 +410,7 @@
 }
 
 .resource-grid-row:hover {
-  background: rgba(250, 250, 250, 0.6);
+  background: var(--surface-muted);
 }
 
 .col-resource {
@@ -444,16 +445,16 @@
   margin-right: 8px;
   font-family: var(--font-mono);
   font-size: 12px;
-  color: var(--zinc-400);
+  color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
 
 .resource-grid-row .resource-id {
   flex-shrink: 0;
   padding: 2px 6px;
-  border: 1px solid rgba(228, 228, 231, 0.8);
+  border: 1px solid var(--border-default);
   border-radius: 4px;
-  background: var(--zinc-100);
+  background: var(--surface-subtle);
   font-size: 11px;
   line-height: 16px;
 }
@@ -462,7 +463,7 @@
   min-width: 0;
   font-size: 14px;
   font-weight: 500;
-  color: var(--zinc-900);
+  color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -472,7 +473,7 @@
   margin: 2px 0 0;
   padding-left: 36px;
   font-size: 12px;
-  color: var(--zinc-500);
+  color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -484,7 +485,7 @@
   column-gap: 4px;
   font-family: var(--font-sans);
   font-size: 12px;
-  color: var(--zinc-700);
+  color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -492,16 +493,16 @@
 .capacity-text svg {
   flex-shrink: 0;
   margin-right: 2px;
-  color: var(--zinc-400);
+  color: var(--text-muted);
 }
 
 .capacity-value {
   font-weight: 500;
-  color: var(--zinc-900);
+  color: var(--text-primary);
 }
 
 .capacity-unit {
-  color: var(--zinc-500);
+  color: var(--text-secondary);
 }
 
 .inline-status {
@@ -510,17 +511,17 @@
   gap: 7px;
   font-size: 12px;
   font-weight: 500;
-  color: var(--zinc-700);
+  color: var(--text-secondary);
 }
 
 .resource-status-badge {
   display: inline-flex;
   align-items: center;
   padding: 2px 8px;
-  border: 1px solid var(--zinc-200);
+  border: 1px solid var(--border-default);
   border-radius: 4px;
-  background: var(--zinc-50);
-  color: var(--zinc-700);
+  background: var(--surface-muted);
+  color: var(--text-secondary);
   font-size: 11px;
   font-weight: 500;
   white-space: nowrap;
@@ -536,7 +537,7 @@
   display: block;
   margin-top: 2px;
   font-size: 11px;
-  color: var(--zinc-400);
+  color: var(--text-muted);
 }
 
 .resource-book-button,
@@ -558,18 +559,18 @@
 
 .resource-book-button {
   padding: 0 10px;
-  border: 1px solid var(--zinc-200);
-  background: #ffffff;
-  color: var(--zinc-900);
+  border: 1px solid var(--border-default);
+  background: var(--surface);
+  color: var(--text-primary);
   font-weight: 500;
 }
 
 .resource-book-button:hover:not(:disabled) {
-  background: var(--zinc-50);
+  background: var(--surface-muted);
 }
 
 .resource-book-button:disabled {
-  color: var(--zinc-400);
+  color: var(--text-muted);
   cursor: not-allowed;
 }
 
@@ -577,12 +578,12 @@
   padding: 0 8px;
   border: 0;
   background: transparent;
-  color: var(--zinc-500);
+  color: var(--text-secondary);
 }
 
 .resource-availability-button:hover:not(:disabled) {
-  background: var(--zinc-100);
-  color: var(--zinc-900);
+  background: var(--surface-subtle);
+  color: var(--text-primary);
 }
 
 .resource-availability-button:disabled {
@@ -597,10 +598,10 @@
   flex-wrap: wrap;
   gap: 4px 16px;
   padding: 8px 16px;
-  border-top: 1px solid var(--zinc-200);
-  background: rgba(250, 250, 250, 0.6);
+  border-top: 1px solid var(--border-default);
+  background: var(--surface-muted);
   font-size: 11px;
-  color: var(--zinc-500);
+  color: var(--text-secondary);
 }
 
 .resource-table-count {
@@ -652,8 +653,8 @@
 }
 
 .row-btn-primary:disabled {
-  background: var(--zinc-100);
-  color: var(--zinc-400);
+  background: var(--surface-subtle);
+  color: var(--text-muted);
   cursor: not-allowed;
 }
 
@@ -664,10 +665,10 @@
   gap: 5px;
   height: 28px;
   padding: 0 8px;
-  border: 1px solid var(--zinc-200);
+  border: 1px solid var(--border-default);
   border-radius: 4px;
-  background: #ffffff;
-  color: var(--zinc-700);
+  background: var(--surface);
+  color: var(--text-secondary);
   font-size: 12px;
   font-weight: 400;
   cursor: pointer;
@@ -675,7 +676,7 @@
 }
 
 .row-btn-secondary:hover:not(:disabled) {
-  background: var(--zinc-100);
+  background: var(--surface-subtle);
 }
 
 .row-btn-secondary:disabled {
@@ -692,7 +693,7 @@
   border: 0;
   border-radius: 4px;
   background: transparent;
-  color: var(--zinc-400);
+  color: var(--text-muted);
   cursor: pointer;
   transition:
     color 120ms ease,
@@ -713,7 +714,7 @@
   padding: 32px 16px;
   text-align: center;
   font-size: 12px;
-  color: var(--zinc-500);
+  color: var(--text-secondary);
 }
 
 /* ==========================================================================
@@ -723,9 +724,9 @@
 .resource-form,
 .customer-form {
   padding: 16px;
-  border: 1px solid var(--zinc-200);
+  border: 1px solid var(--border-default);
   border-radius: 6px;
-  background: #ffffff;
+  background: var(--surface);
   margin-bottom: 16px;
 }
 
@@ -738,7 +739,7 @@
 .directory-form-title {
   grid-column: 1 / -1;
   margin: 0;
-  color: var(--zinc-900);
+  color: var(--text-primary);
   font-size: 14px;
   font-weight: 600;
 }
@@ -756,15 +757,15 @@
   gap: 12px;
   width: 100%;
   padding: 8px 10px;
-  border: 1px solid var(--zinc-200);
+  border: 1px solid var(--border-default);
   border-radius: 4px;
-  background: var(--zinc-50);
-  color: var(--zinc-500);
+  background: var(--surface-muted);
+  color: var(--text-secondary);
   font-size: 12px;
 }
 
 .booking-availability.availability-available {
-  color: var(--zinc-700);
+  color: var(--text-secondary);
 }
 
 .booking-availability.availability-invalid,
@@ -795,7 +796,7 @@
 .login-card label {
   display: grid;
   gap: 6px;
-  color: var(--zinc-700);
+  color: var(--text-secondary);
   font-size: 12px;
   font-weight: 500;
 }
@@ -809,10 +810,10 @@
   min-width: 0;
   height: 32px;
   padding: 0 10px;
-  border: 1px solid var(--zinc-200);
+  border: 1px solid var(--border-default);
   border-radius: 6px;
-  color: var(--zinc-900);
-  background: #ffffff;
+  color: var(--text-primary);
+  background: var(--surface);
   font-size: 12px;
   transition: border-color 120ms ease;
 }
@@ -842,7 +843,7 @@
 }
 
 .optional-label {
-  color: var(--zinc-400);
+  color: var(--text-muted);
   font-weight: 400;
 }
 
@@ -880,15 +881,15 @@
 }
 
 .create-button:disabled {
-  background: var(--zinc-100);
-  color: var(--zinc-400);
+  background: var(--surface-subtle);
+  color: var(--text-muted);
   cursor: wait;
 }
 
 .form-message {
   margin: 0;
   font-size: 12px;
-  color: var(--zinc-600);
+  color: var(--text-secondary);
 }
 
 .status-banner {
@@ -896,9 +897,9 @@
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  border: 1px solid var(--zinc-200);
+  border: 1px solid var(--border-default);
   border-radius: 6px;
-  background: #ffffff;
+  background: var(--surface);
   margin: 0 0 12px;
   font-size: 12px;
   font-weight: 500;
@@ -925,13 +926,13 @@
   margin: 0;
   font-size: 14px;
   font-weight: 600;
-  color: var(--zinc-900);
+  color: var(--text-primary);
 }
 
 .booking-create-heading p {
   margin: 2px 0 0;
   font-size: 12px;
-  color: var(--zinc-500);
+  color: var(--text-secondary);
 }
 
 .quick-slot-bar {
@@ -943,16 +944,16 @@
 
 .quick-slot-label {
   font-size: 12px;
-  color: var(--zinc-500);
+  color: var(--text-secondary);
 }
 
 .preset-chip {
   height: 24px;
   padding: 0 8px;
-  border: 1px solid var(--zinc-200);
+  border: 1px solid var(--border-default);
   border-radius: 4px;
-  background: #ffffff;
-  color: var(--zinc-600);
+  background: var(--surface);
+  color: var(--text-secondary);
   font-family: var(--font-mono);
   font-size: 11px;
   cursor: pointer;
@@ -960,15 +961,15 @@
 }
 
 .preset-chip:hover {
-  background: var(--zinc-100);
-  color: var(--zinc-900);
+  background: var(--surface-subtle);
+  color: var(--text-primary);
 }
 
 .booking-table-wrap {
   overflow-x: auto;
-  border: 1px solid var(--zinc-200);
+  border: 1px solid var(--border-default);
   border-radius: 6px;
-  background: #ffffff;
+  background: var(--surface);
 }
 
 .booking-table {
@@ -980,9 +981,9 @@
 
 .booking-table th {
   padding: 8px 16px;
-  background: rgba(250, 250, 250, 0.8);
-  border-bottom: 1px solid var(--zinc-200);
-  color: var(--zinc-500);
+  background: var(--surface-muted);
+  border-bottom: 1px solid var(--border-default);
+  color: var(--text-secondary);
   font-size: 11px;
   font-weight: 500;
   text-transform: uppercase;
@@ -991,8 +992,8 @@
 
 .booking-table td {
   padding: 12px 16px;
-  border-bottom: 1px solid var(--zinc-200);
-  color: var(--zinc-600);
+  border-bottom: 1px solid var(--border-default);
+  color: var(--text-secondary);
   font-size: 12px;
 }
 
@@ -1001,11 +1002,11 @@
 }
 
 .booking-table tbody tr:hover {
-  background: rgba(250, 250, 250, 0.6);
+  background: var(--surface-muted);
 }
 
 .booking-resource {
-  color: var(--zinc-900) !important;
+  color: var(--text-primary) !important;
   font-size: 13px !important;
   font-weight: 500;
 }
@@ -1013,7 +1014,7 @@
 .mono-cell {
   font-family: var(--font-mono);
   font-size: 12px;
-  color: var(--zinc-700);
+  color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
 }
 
@@ -1031,10 +1032,10 @@
 
 .message {
   padding: 16px;
-  border: 1px solid var(--zinc-200);
+  border: 1px solid var(--border-default);
   border-radius: 6px;
-  background: #ffffff;
-  color: var(--zinc-600);
+  background: var(--surface);
+  color: var(--text-secondary);
   font-size: 12px;
 }
 
@@ -1049,17 +1050,17 @@
 .error-message button {
   height: 28px;
   padding: 0 10px;
-  border: 1px solid var(--zinc-200);
+  border: 1px solid var(--border-default);
   border-radius: 4px;
-  background: #ffffff;
-  color: var(--zinc-900);
+  background: var(--surface);
+  color: var(--text-primary);
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
 }
 
 /* ==========================================================================
-   Login View (Utilitarian Zinc Card)
+   Login View
    ========================================================================== */
 .login-page {
   min-height: 100vh;
@@ -1075,23 +1076,23 @@
   display: grid;
   gap: 14px;
   padding: 24px;
-  border: 1px solid var(--zinc-200);
+  border: 1px solid var(--border-default);
   border-radius: 6px;
-  background: #ffffff;
+  background: var(--surface);
 }
 
 .login-card-header h1 {
   margin: 0;
   font-size: 18px;
   font-weight: 600;
-  color: var(--zinc-900);
+  color: var(--text-primary);
   letter-spacing: -0.025em;
 }
 
 .login-subtitle {
   margin: 4px 0 0;
   font-size: 12px;
-  color: var(--zinc-500);
+  color: var(--text-secondary);
 }
 
 .wakeup-notice {
@@ -1099,10 +1100,10 @@
   align-items: center;
   gap: 8px;
   padding: 8px 10px;
-  border: 1px solid var(--zinc-200);
+  border: 1px solid var(--border-default);
   border-radius: 6px;
-  background: var(--zinc-50);
-  color: var(--zinc-600);
+  background: var(--surface-muted);
+  color: var(--text-secondary);
   font-size: 12px;
 }
 

@@ -1130,6 +1130,9 @@ function App({ onLogout }: AppProps) {
                     ))}
                   </div>
                 </div>
+                <span className="sr-only" role="status">
+                  Showing {filteredResources.length} of {resources.length} resources
+                </span>
               </div>
             )}
           </section>

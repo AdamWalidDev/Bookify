@@ -622,10 +622,23 @@ select:focus-visible {
   white-space: nowrap;
 }
 
-.capacity-text svg {
+.capacity-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
   flex-shrink: 0;
   margin-right: 2px;
-  color: var(--text-muted);
+  border: 1px solid var(--border-strong);
+  border-top-color: var(--surface);
+  border-radius: 8px;
+  background: linear-gradient(145deg, var(--surface), var(--surface-subtle));
+  color: var(--text-secondary);
+  box-shadow:
+    0 2px 4px rgb(28 25 23 / 14%),
+    inset 0 1px 0 rgb(255 255 255 / 90%),
+    inset 0 -1px 1px rgb(28 25 23 / 8%);
 }
 
 .capacity-value {

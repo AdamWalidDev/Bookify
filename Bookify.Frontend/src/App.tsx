@@ -1064,7 +1064,9 @@ function App({ onLogout }: AppProps) {
 
                         <div className="col-capacity" role="cell">
                           <span className="capacity-text">
-                            <Users size={14} aria-hidden="true" />
+                            <span className="capacity-icon" aria-hidden="true">
+                              <Users size={14} />
+                            </span>
                             <span className="capacity-value">{resource.capacity}</span>
                             {' '}
                             <span className="capacity-unit">

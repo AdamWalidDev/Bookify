@@ -51,7 +51,7 @@ function Login({ onLogin }: LoginProps) {
       setError(
         loginError instanceof Error
           ? loginError.message === 'Failed to fetch'
-            ? 'Cannot reach the API. If hosted on Render free tier, please wait ~30 seconds and try again.'
+            ? 'Unable to connect. Please wait about 30 seconds and try again.'
             : loginError.message
           : 'Login failed.',
       )
@@ -63,56 +63,60 @@ function Login({ onLogin }: LoginProps) {
   }
 
   return (
-    <div className="login-page">
-      <form className="login-card" onSubmit={handleSubmit}>
-        <div className="brand">
-          <img className="brand-mark" src="/bookify-mark.png" alt="" aria-hidden="true" />
-          <span className="brand-title">Bookify</span>
-          <span className="brand-divider" aria-hidden="true">/</span>
-          <span className="brand-badge">Workspace</span>
-        </div>
-
-        <div className="login-card-header">
-          <h1>Sign in</h1>
-          <p className="login-subtitle">Enter your workspace credentials to continue.</p>
-        </div>
-
-        <label>
-          Username
-          <input
-            value={username}
-            onChange={(event) => setUsername(event.target.value)}
-            autoComplete="username"
-            placeholder="Enter username"
-            required
-          />
-        </label>
-        <label>
-          Password
-          <input
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            autoComplete="current-password"
-            placeholder="Enter password"
-            required
-          />
-        </label>
-
-        {isSlowWakeup && !error && (
-          <div className="wakeup-notice" role="status">
-            <span className="status-dot dot-amber" />
-            <span>Waking up the API server (free tier cold start takes ~25s)...</span>
+    <main className="login-page">
+      <form className="login-card" aria-labelledby="login-title" onSubmit={handleSubmit}>
+        <div className="login-card-intro">
+          <div className="brand">
+            <img className="brand-mark" src="/bookify-mark.png" alt="" aria-hidden="true" />
+            <span className="brand-title">Bookify</span>
+            <span className="brand-divider" aria-hidden="true">/</span>
+            <span className="brand-badge">Workspace</span>
           </div>
-        )}
 
-        {error && <p className="form-message error-text" role="alert">{error}</p>}
+          <div className="login-card-header">
+            <h1 id="login-title">Sign in</h1>
+            <p className="login-subtitle">Enter your workspace credentials to continue.</p>
+          </div>
+        </div>
 
-        <button type="submit" className="create-button login-submit-button" disabled={isSubmitting}>
-          {isSubmitting ? 'Signing in...' : 'Sign in'}
-        </button>
+        <div className="login-card-fields">
+          <label>
+            Username
+            <input
+              value={username}
+              onChange={(event) => setUsername(event.target.value)}
+              autoComplete="username"
+              placeholder="Enter username"
+              required
+            />
+          </label>
+          <label>
+            Password
+            <input
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              autoComplete="current-password"
+              placeholder="Enter password"
+              required
+            />
+          </label>
+
+          {isSlowWakeup && !error && (
+            <div className="wakeup-notice" role="status">
+              <span className="status-dot dot-amber" aria-hidden="true" />
+              <span>The workspace is starting up. This can take about 30 seconds.</span>
+            </div>
+          )}
+
+          {error && <p className="form-message error-text" role="alert">{error}</p>}
+
+          <button type="submit" className="create-button login-submit-button" disabled={isSubmitting}>
+            {isSubmitting ? 'Signing in...' : 'Sign in'}
+          </button>
+        </div>
       </form>
-    </div>
+    </main>
   )
 }
 

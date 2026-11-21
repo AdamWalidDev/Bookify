@@ -469,6 +469,32 @@ select:focus-visible {
   margin-bottom: 20px;
 }
 
+.resource-form-reveal {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition:
+    grid-template-rows 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    visibility 0s linear 200ms;
+}
+
+.resource-form-reveal.is-open {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.resource-form-reveal-content {
+  min-height: 0;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .resource-form-reveal {
+    transition: none;
+  }
+}
+
 .resources-page .empty-state {
   padding: 48px 24px;
   font-size: 14px;

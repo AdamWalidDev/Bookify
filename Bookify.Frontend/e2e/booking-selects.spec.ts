@@ -47,14 +47,18 @@ for (const reducedMotion of [false, true]) {
       await expect.poll(arrowRotation).toBe('45deg')
       expect(await select.evaluate((element: HTMLSelectElement) => element.validity.valueMissing)).toBe(false)
 
-      // Keyboard users can reopen, choose, and close the same native control.
+      // Choose a different option so a missed keyboard update cannot pass.
+      const keyboardValue = await select.locator('option').nth(2).getAttribute('value')
+      expect(keyboardValue).toBeTruthy()
+      expect(keyboardValue).not.toBe(value)
       await select.focus()
       await page.keyboard.press('Space')
       await expect.poll(isOpen).toBe(true)
       await page.keyboard.press('Home')
       await page.keyboard.press('ArrowDown')
+      await page.keyboard.press('ArrowDown')
       await page.keyboard.press('Enter')
-      await expect(select).toHaveValue(value!)
+      await expect(select).toHaveValue(keyboardValue!)
       await expect.poll(isOpen).toBe(false)
 
       await select.click()

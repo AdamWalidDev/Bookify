@@ -1436,6 +1436,8 @@ function App({ onLogout }: AppProps) {
                     <label>
                       Customer
                       <select
+                        className="booking-select"
+                        name="customerId"
                         required
                         value={bookingForm.customerId}
                         onChange={(event) =>
@@ -1454,6 +1456,8 @@ function App({ onLogout }: AppProps) {
                     <label>
                       Resource
                       <select
+                        className="booking-select"
+                        name="resourceId"
                         required
                         value={bookingForm.resourceId}
                         onChange={(event) =>

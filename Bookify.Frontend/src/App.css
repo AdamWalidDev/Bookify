@@ -1263,6 +1263,93 @@ select:focus-visible {
   font-size: 14px;
 }
 
+/* Keep native selection and validation, with an animated picker where supported. */
+@supports (appearance: base-select) {
+  .bookings-page .booking-select,
+  .bookings-page .booking-select::picker(select) {
+    appearance: base-select;
+  }
+
+  .bookings-page .booking-select {
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+  }
+
+  .bookings-page .booking-select::picker-icon {
+    content: '';
+    width: 7px;
+    height: 7px;
+    flex-shrink: 0;
+    margin-right: 3px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    color: var(--text-secondary);
+    rotate: 45deg;
+    transition: rotate 200ms ease;
+  }
+
+  .bookings-page .booking-select:open::picker-icon {
+    rotate: 225deg;
+  }
+
+  .bookings-page .booking-select::picker(select) {
+    min-inline-size: anchor-size(inline);
+    max-inline-size: calc(100vw - 32px);
+    max-block-size: min(20rem, 60dvh);
+    margin-block: 6px;
+    padding: 4px;
+    overflow-y: auto;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--control-radius);
+    background: var(--surface);
+    color: var(--text-primary);
+    box-shadow: 0 8px 24px rgb(28 25 23 / 12%);
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+    transition-property: opacity, clip-path, display, overlay;
+    transition-duration: 200ms;
+    transition-timing-function: ease;
+    transition-behavior: allow-discrete;
+  }
+
+  .bookings-page .booking-select:open::picker(select) {
+    opacity: 1;
+    clip-path: inset(0);
+  }
+
+  @starting-style {
+    .bookings-page .booking-select:open::picker(select) {
+      opacity: 0;
+      clip-path: inset(0 0 100% 0);
+    }
+  }
+
+  .bookings-page .booking-select option {
+    min-height: 40px;
+    padding: 10px 12px;
+    gap: 10px;
+    border-radius: 4px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+  }
+
+  .bookings-page .booking-select option:hover,
+  .bookings-page .booking-select option:focus-visible,
+  .bookings-page .booking-select option:checked {
+    background: var(--brand-soft);
+    color: var(--text-primary);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bookings-page .booking-select::picker(select),
+    .bookings-page .booking-select::picker-icon {
+      transition: none;
+    }
+  }
+}
+
 .bookings-page .booking-form-footer,
 .bookings-page .booking-availability {
   flex-wrap: wrap;

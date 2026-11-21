@@ -8,6 +8,7 @@ import {
   Search,
   Trash2,
   Users,
+  Wrench,
   X,
 } from 'lucide-react'
 import './App.css'
@@ -809,7 +810,7 @@ function App({ onLogout }: AppProps) {
         </div>
       </header>
 
-      <main className="main-content">
+      <main className={`main-content${activePage === 'resources' ? ' resources-page' : ''}`}>
         <section className="page-heading">
           <div className="page-heading-left">
             <h1>
@@ -821,7 +822,7 @@ function App({ onLogout }: AppProps) {
             </h1>
             <p className="page-description">
               {activePage === 'resources'
-                ? 'Manage architectural rooms, studios, and equipment capacity'
+                ? 'Find a space, review capacity, and manage availability'
                 : activePage === 'customers'
                   ? 'Directory of team members and organizations authorized to reserve spaces'
                   : 'Create conflict-free reservations and manage live booking statuses'}
@@ -867,6 +868,7 @@ function App({ onLogout }: AppProps) {
                   <button
                     type="button"
                     className={resourceFilter === 'all' ? 'active' : ''}
+                    aria-pressed={resourceFilter === 'all'}
                     onClick={() => setResourceFilter('all')}
                   >
                     All
@@ -874,6 +876,7 @@ function App({ onLogout }: AppProps) {
                   <button
                     type="button"
                     className={resourceFilter === 'available' ? 'active' : ''}
+                    aria-pressed={resourceFilter === 'available'}
                     onClick={() => setResourceFilter('available')}
                   >
                     Available
@@ -881,6 +884,7 @@ function App({ onLogout }: AppProps) {
                   <button
                     type="button"
                     className={resourceFilter === 'unavailable' ? 'active' : ''}
+                    aria-pressed={resourceFilter === 'unavailable'}
                     onClick={() => setResourceFilter('unavailable')}
                   >
                     Maintenance
@@ -1067,6 +1071,9 @@ function App({ onLogout }: AppProps) {
                           <span
                             className={`resource-status-badge${resource.isAvailable ? '' : ' is-maintenance'}`}
                           >
+                            {resource.isAvailable
+                              ? <Check size={12} aria-hidden="true" />
+                              : <Wrench size={12} aria-hidden="true" />}
                             {resource.isAvailable ? 'Available' : 'Maintenance'}
                           </span>
                           <span className="resource-status-detail">

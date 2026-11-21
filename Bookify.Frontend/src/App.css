@@ -407,8 +407,10 @@ select:focus-visible {
 }
 
 .resources-page .telemetry-strip {
-  padding: 12px 16px;
-  border-radius: 12px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   line-height: 1.5;
 }
 
@@ -698,23 +700,6 @@ select:focus-visible {
   border: 0;
   background: transparent;
   color: var(--text-secondary);
-}
-
-.resource-table-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px 16px;
-  padding: 16px 24px;
-  border-top: 1px solid var(--border-default);
-  background: var(--surface-muted);
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-.resource-table-count {
-  font-variant-numeric: tabular-nums;
 }
 
 .status-dot {
@@ -1273,8 +1258,7 @@ select:disabled {
     flex-wrap: wrap;
   }
 
-  .resource-grid-row,
-  .resource-table-footer {
+  .resource-grid-row {
     padding: 20px 16px;
   }
 }

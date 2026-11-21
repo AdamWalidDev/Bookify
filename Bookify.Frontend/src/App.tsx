@@ -1082,9 +1082,9 @@ function App({ onLogout }: AppProps) {
                               : <Wrench size={12} aria-hidden="true" />}
                             {resource.isAvailable ? 'Available' : 'Maintenance'}
                           </span>
-                          <span className="resource-status-detail">
-                            {resource.isAvailable ? 'Ready for instant booking' : 'Paused for maintenance'}
-                          </span>
+                          {!resource.isAvailable && (
+                            <span className="resource-status-detail">Paused for maintenance</span>
+                          )}
                         </div>
 
                         <div className="col-actions" role="cell">
@@ -1127,12 +1127,6 @@ function App({ onLogout }: AppProps) {
                       </div>
                     ))}
                   </div>
-                </div>
-                <div className="resource-table-footer">
-                  <span className="resource-table-count" role="status">
-                    Showing {filteredResources.length} of {resources.length} resources
-                  </span>
-                  <span>Real-time conflict checking active</span>
                 </div>
               </div>
             )}

@@ -145,6 +145,7 @@ function App({ onLogout }: AppProps) {
   const [customerFormSuccess, setCustomerFormSuccess] = useState('')
   const [customerActionBusyId, setCustomerActionBusyId] = useState<number | null>(null)
 
+  const [isBookingFormOpen, setIsBookingFormOpen] = useState(false)
   const [bookingForm, setBookingForm] = useState({
     customerId: '',
     resourceId: '',
@@ -166,7 +167,7 @@ function App({ onLogout }: AppProps) {
   const availability = useBookingAvailability({
     ...bookingForm,
     revision: bookingsReload + reload,
-    enabled: activePage === 'bookings',
+    enabled: activePage === 'bookings' && isBookingFormOpen,
   })
   const editAvailability = useBookingAvailability({
     ...editBookingForm,
@@ -522,6 +523,13 @@ function App({ onLogout }: AppProps) {
     }
   }
 
+  function closeBookingForm() {
+    setIsBookingFormOpen(false)
+    setBookingForm({ customerId: '', resourceId: '', startDate: '', endDate: '' })
+    setCreateBookingError('')
+    setCreateBookingSuccess('')
+  }
+
   async function handleCreateBooking(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     setCreateBookingError('')
@@ -566,7 +574,7 @@ function App({ onLogout }: AppProps) {
         startDate: '',
         endDate: '',
       }))
-      setCreateBookingSuccess('Reservation scheduled and verified against conflicts.')
+      setCreateBookingSuccess('Booking created.')
       setBookingsReload((value) => value + 1)
     } catch (submitError) {
       setCreateBookingError(
@@ -686,6 +694,7 @@ function App({ onLogout }: AppProps) {
   }
 
   function handleQuickBookResource(resource: Resource) {
+    setIsBookingFormOpen(true)
     const slot = createFutureSlot(1, 10, 2)
     setBookingForm((current) => ({
       customerId: current.customerId || (customers[0] ? String(customers[0].id) : ''),
@@ -699,6 +708,7 @@ function App({ onLogout }: AppProps) {
   }
 
   function handleQuickBookCustomer(customer: Customer) {
+    setIsBookingFormOpen(true)
     const availableResource = resources.find((item) => item.isAvailable)
     const slot = createFutureSlot(1, 14, 2)
     setBookingForm((current) => ({
@@ -713,6 +723,7 @@ function App({ onLogout }: AppProps) {
   }
 
   function applyQuickSlot(daysAhead: number, startHour: number, durationHours: number) {
+    setIsBookingFormOpen(true)
     const slot = createFutureSlot(daysAhead, startHour, durationHours)
     setBookingForm((current) => ({
       ...current,
@@ -798,7 +809,10 @@ function App({ onLogout }: AppProps) {
             <button
               type="button"
               className="schedule-slot-btn"
-              onClick={() => navigateTo('bookings')}
+              onClick={() => {
+                setIsBookingFormOpen(true)
+                navigateTo('bookings')
+              }}
             >
               <CalendarPlus size={14} />
               <span>Schedule a Slot</span>
@@ -825,7 +839,7 @@ function App({ onLogout }: AppProps) {
                 ? 'Find a space, review capacity, and manage availability'
                 : activePage === 'customers'
                   ? 'Find customers, update contact details, and manage reservations'
-                  : 'Create conflict-free reservations and manage live booking statuses'}
+                  : 'Create reservations, update times, and manage booking status'}
             </p>
           </div>
 
@@ -1359,10 +1373,6 @@ function App({ onLogout }: AppProps) {
         {activePage === 'bookings' && (
           <section id="bookings" className="view-panel" aria-labelledby="booking-list-title">
             <div className="booking-create-heading">
-              <div>
-                <h2>New reservation</h2>
-                <p>Select a customer, available space, and time window.</p>
-              </div>
               <div className="quick-slot-bar" aria-label="Quick time presets">
                 <span className="quick-slot-label">Presets:</span>
                 <button
@@ -1387,109 +1397,134 @@ function App({ onLogout }: AppProps) {
                   +3d 10:00–13:00
                 </button>
               </div>
+              <button
+                className="add-resource-button"
+                type="button"
+                onClick={() => {
+                  if (isBookingFormOpen) closeBookingForm()
+                  else setIsBookingFormOpen(true)
+                  setCreateBookingError('')
+                  setCreateBookingSuccess('')
+                }}
+                disabled={isCreatingBooking}
+                aria-expanded={isBookingFormOpen}
+                aria-controls="booking-create-panel"
+              >
+                <Plus size={14} aria-hidden="true" />
+                <span>{isBookingFormOpen ? 'Close form' : 'Add booking'}</span>
+              </button>
             </div>
 
-            {customersError ? (
-              <p className="status-banner error-text" role="alert">{customersError}</p>
-            ) : resources.filter((resource) => resource.isAvailable).length === 0 ||
-              customers.length === 0 ? (
-              <div className="data-list-container">
-                <div className="empty-state">
-                  Add a customer and at least one available resource before creating a booking.
-                </div>
+            <div
+              id="booking-create-panel"
+              className={`booking-form-reveal${isBookingFormOpen ? ' is-open' : ''}`}
+              aria-hidden={!isBookingFormOpen}
+              inert={!isBookingFormOpen}
+            >
+              <div className="booking-form-reveal-content">
+                {customersError ? (
+                  <p className="status-banner error-text" role="alert">{customersError}</p>
+                ) : resources.filter((resource) => resource.isAvailable).length === 0 ||
+                  customers.length === 0 ? (
+                  <div className="data-list-container">
+                    <div className="empty-state">
+                      Add a customer and at least one available resource before creating a booking.
+                    </div>
+                  </div>
+                ) : (
+                  <form className="booking-form" aria-label="New reservation" onSubmit={handleCreateBooking}>
+                    <label>
+                      Customer
+                      <select
+                        required
+                        value={bookingForm.customerId}
+                        onChange={(event) =>
+                          setBookingForm((current) => ({ ...current, customerId: event.target.value }))
+                        }
+                      >
+                        <option value="">Choose a customer</option>
+                        {customers.map((customer) => (
+                          <option key={customer.id} value={customer.id}>
+                            {customer.name} ({customer.email})
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label>
+                      Resource
+                      <select
+                        required
+                        value={bookingForm.resourceId}
+                        onChange={(event) =>
+                          setBookingForm((current) => ({ ...current, resourceId: event.target.value }))
+                        }
+                      >
+                        <option value="">Choose a resource</option>
+                        {resources
+                          .filter((resource) => resource.isAvailable)
+                          .map((resource) => (
+                            <option key={resource.id} value={resource.id}>
+                              {resource.name} (up to {resource.capacity})
+                            </option>
+                          ))}
+                      </select>
+                    </label>
+
+                    <label>
+                      Starts
+                      <input
+                        required
+                        type="datetime-local"
+                        value={bookingForm.startDate}
+                        onChange={(event) =>
+                          setBookingForm((current) => ({ ...current, startDate: event.target.value }))
+                        }
+                      />
+                    </label>
+
+                    <label>
+                      Ends
+                      <input
+                        required
+                        type="datetime-local"
+                        min={bookingForm.startDate || undefined}
+                        value={bookingForm.endDate}
+                        onChange={(event) =>
+                          setBookingForm((current) => ({ ...current, endDate: event.target.value }))
+                        }
+                      />
+                    </label>
+
+                    <div className="booking-form-footer">
+                      <div className={`booking-availability availability-${availability.status}`} role="status" aria-label="Reservation availability" aria-live="polite">
+                        <span>{availability.message}</span>
+                        {availability.status === 'error' && (
+                          <button type="button" className="row-btn-secondary" onClick={availability.retry}>Try again</button>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="booking-form-footer">
+                      <div aria-live="polite">
+                        {createBookingError && (
+                          <p className="form-message error-text" role="alert">{createBookingError}</p>
+                        )}
+                        {createBookingSuccess && (
+                          <p className="form-message success-text" role="status">
+                            {createBookingSuccess}
+                          </p>
+                        )}
+                      </div>
+                      <button className="create-button" type="submit" disabled={isCreatingBooking || availability.status !== 'available'}>
+                        <Plus size={14} />
+                        {isCreatingBooking ? 'Scheduling...' : 'Create booking'}
+                      </button>
+                    </div>
+                  </form>
+                )}
               </div>
-            ) : (
-              <form className="booking-form" aria-label="New reservation" onSubmit={handleCreateBooking}>
-                <label>
-                  Customer
-                  <select
-                    required
-                    value={bookingForm.customerId}
-                    onChange={(event) =>
-                      setBookingForm((current) => ({ ...current, customerId: event.target.value }))
-                    }
-                  >
-                    <option value="">Choose a customer</option>
-                    {customers.map((customer) => (
-                      <option key={customer.id} value={customer.id}>
-                        {customer.name} ({customer.email})
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <label>
-                  Resource
-                  <select
-                    required
-                    value={bookingForm.resourceId}
-                    onChange={(event) =>
-                      setBookingForm((current) => ({ ...current, resourceId: event.target.value }))
-                    }
-                  >
-                    <option value="">Choose a resource</option>
-                    {resources
-                      .filter((resource) => resource.isAvailable)
-                      .map((resource) => (
-                        <option key={resource.id} value={resource.id}>
-                          {resource.name} (up to {resource.capacity})
-                        </option>
-                      ))}
-                  </select>
-                </label>
-
-                <label>
-                  Starts
-                  <input
-                    required
-                    type="datetime-local"
-                    value={bookingForm.startDate}
-                    onChange={(event) =>
-                      setBookingForm((current) => ({ ...current, startDate: event.target.value }))
-                    }
-                  />
-                </label>
-
-                <label>
-                  Ends
-                  <input
-                    required
-                    type="datetime-local"
-                    min={bookingForm.startDate || undefined}
-                    value={bookingForm.endDate}
-                    onChange={(event) =>
-                      setBookingForm((current) => ({ ...current, endDate: event.target.value }))
-                    }
-                  />
-                </label>
-
-                <div className="booking-form-footer">
-                  <div className={`booking-availability availability-${availability.status}`} role="status" aria-label="Reservation availability" aria-live="polite">
-                    <span>{availability.message}</span>
-                    {availability.status === 'error' && (
-                      <button type="button" className="row-btn-secondary" onClick={availability.retry}>Try again</button>
-                    )}
-                  </div>
-                </div>
-
-                <div className="booking-form-footer">
-                  <div aria-live="polite">
-                    {createBookingError && (
-                      <p className="form-message error-text" role="alert">{createBookingError}</p>
-                    )}
-                    {createBookingSuccess && (
-                      <p className="form-message success-text" role="status">
-                        {createBookingSuccess}
-                      </p>
-                    )}
-                  </div>
-                  <button className="create-button" type="submit" disabled={isCreatingBooking || availability.status !== 'available'}>
-                    <Plus size={14} />
-                    {isCreatingBooking ? 'Scheduling...' : 'Create booking'}
-                  </button>
-                </div>
-              </form>
-            )}
+            </div>
 
             <div className="control-toolbar">
               <div className="toolbar-left">
@@ -1536,73 +1571,79 @@ function App({ onLogout }: AppProps) {
               </p>
             )}
 
-            {editingBooking && (
-              <form
-                className="booking-form booking-edit-form"
-                aria-label="Edit booking"
-                onSubmit={handleUpdateBooking}
-              >
-                <div className="booking-create-heading booking-edit-heading">
-                  <div>
-                    <h2>Edit booking #{editingBooking.id}</h2>
-                    <p>{editingBooking.resourceName} for {editingBooking.customerName}</p>
+            <div
+              className={`booking-form-reveal${editingBooking ? ' is-open' : ''}`}
+              aria-hidden={!editingBooking}
+              inert={!editingBooking}
+            >
+              <div className="booking-form-reveal-content">
+                <form
+                  className="booking-form booking-edit-form"
+                  aria-label="Edit booking"
+                  onSubmit={handleUpdateBooking}
+                >
+                  <div className="booking-create-heading booking-edit-heading">
+                    <div>
+                      <h2>Edit booking #{editingBooking?.id}</h2>
+                      <p>{editingBooking?.resourceName} for {editingBooking?.customerName}</p>
+                    </div>
+                    <button
+                      className="icon-button"
+                      type="button"
+                      aria-label="Close booking editor"
+                      onClick={() => setEditingBooking(null)}
+                    >
+                      <X size={14} />
+                    </button>
                   </div>
-                  <button
-                    className="icon-button"
-                    type="button"
-                    aria-label="Close booking editor"
-                    onClick={() => setEditingBooking(null)}
-                  >
-                    <X size={14} />
-                  </button>
-                </div>
-                <label>
-                  Starts
-                  <input
-                    required
-                    type="datetime-local"
-                    value={editBookingForm.startDate}
-                    onChange={(event) =>
-                      setEditBookingForm((current) => ({
-                        ...current,
-                        startDate: event.target.value,
-                      }))
-                    }
-                  />
-                </label>
-                <label>
-                  Ends
-                  <input
-                    required
-                    type="datetime-local"
-                    min={editBookingForm.startDate || undefined}
-                    value={editBookingForm.endDate}
-                    onChange={(event) =>
-                      setEditBookingForm((current) => ({
-                        ...current,
-                        endDate: event.target.value,
-                      }))
-                    }
-                  />
-                </label>
-                <div className="booking-form-footer">
-                  <div className={`booking-availability availability-${editAvailability.status}`} role="status" aria-label="Booking edit availability" aria-live="polite">
-                    <span>{editAvailability.message}</span>
-                    {editAvailability.status === 'error' && (
-                      <button type="button" className="row-btn-secondary" onClick={editAvailability.retry}>Try again</button>
-                    )}
+                  <label>
+                    Starts
+                    <input
+                      required
+                      type="datetime-local"
+                      value={editBookingForm.startDate}
+                      onChange={(event) =>
+                        setEditBookingForm((current) => ({
+                          ...current,
+                          startDate: event.target.value,
+                        }))
+                      }
+                    />
+                  </label>
+                  <label>
+                    Ends
+                    <input
+                      required
+                      type="datetime-local"
+                      min={editBookingForm.startDate || undefined}
+                      value={editBookingForm.endDate}
+                      onChange={(event) =>
+                        setEditBookingForm((current) => ({
+                          ...current,
+                          endDate: event.target.value,
+                        }))
+                      }
+                    />
+                  </label>
+                  <div className="booking-form-footer">
+                    <div className={`booking-availability availability-${editAvailability.status}`} role="status" aria-label="Booking edit availability" aria-live="polite">
+                      <span>{editAvailability.message}</span>
+                      {editAvailability.status === 'error' && (
+                        <button type="button" className="row-btn-secondary" onClick={editAvailability.retry}>Try again</button>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                <div className="booking-form-footer">
-                  <span className="form-message">Status: <strong>{editingBooking.status}</strong></span>
-                  <button className="create-button" type="submit" disabled={bookingActionInProgress || editAvailability.status !== 'available'}>
-                    <Check size={14} />
-                    {bookingActionInProgress ? 'Saving...' : 'Save changes'}
-                  </button>
-                </div>
-              </form>
-            )}
+                  <div className="booking-form-footer">
+                    <span className="form-message">Status: <strong>{editingBooking?.status}</strong></span>
+                    <button className="create-button" type="submit" disabled={bookingActionInProgress || editAvailability.status !== 'available'}>
+                      <Check size={14} />
+                      {bookingActionInProgress ? 'Saving...' : 'Save changes'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
 
             {areBookingsLoading ? (
               <div className="data-list-container" role="status">
@@ -1732,11 +1773,12 @@ function App({ onLogout }: AppProps) {
                     ))}
                   </tbody>
                 </table>
-                <div className="booking-table-footer" role="status">
-                  Showing {filteredBookings.length} of {bookings.length} bookings
-                </div>
               </div>
             )}
+            <span className="sr-only" role="status">
+              {!areBookingsLoading && !bookingsError &&
+                `Showing ${filteredBookings.length} of ${bookings.length} bookings`}
+            </span>
           </section>
         )}
       </main>

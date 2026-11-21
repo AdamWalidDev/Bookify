@@ -46,6 +46,38 @@ function futureSlot() {
   return { startDate: `${date}T09:00`, endDate: `${date}T10:00` }
 }
 
+test('booking form opens from the toolbar, presets, and scheduling actions', async ({ page }) => {
+  await login(page)
+  await page.getByRole('link', { name: 'Bookings', exact: true }).click()
+  const form = page.getByRole('form', { name: 'New reservation', exact: true })
+  await expect(form).toBeHidden()
+
+  await page.getByRole('button', { name: 'Add booking', exact: true }).click()
+  await expect(form).toBeVisible()
+  await form.getByLabel('Starts', { exact: true }).fill(futureSlot().startDate)
+  await page.getByRole('button', { name: 'Close form', exact: true }).click()
+  await expect(form).toBeHidden()
+  await page.getByRole('button', { name: 'Add booking', exact: true }).click()
+  await expect(form.getByLabel('Starts', { exact: true })).toBeEmpty()
+  await expect(form.getByLabel('Ends', { exact: true })).toBeEmpty()
+  await page.getByRole('button', { name: 'Close form', exact: true }).click()
+
+  await page.getByRole('button', { name: 'Tomorrow 09:00–11:00', exact: true }).click()
+  await expect(form).toBeVisible()
+  await expect(form.getByLabel('Starts', { exact: true })).not.toBeEmpty()
+  await expect(form.getByLabel('Ends', { exact: true })).not.toBeEmpty()
+  await page.getByRole('button', { name: 'Close form', exact: true }).click()
+
+  await page.getByRole('button', { name: 'Schedule a Slot', exact: true }).click()
+  await expect(form).toBeVisible()
+  await page.getByRole('link', { name: 'Customers', exact: true }).click()
+  const customer = page.getByRole('row').filter({ has: page.getByRole('button', { name: 'New booking', exact: true }) }).first()
+  const customerName = await customer.locator('.customer-name').innerText()
+  await customer.getByRole('button', { name: 'New booking', exact: true }).click()
+  await expect(form).toBeVisible()
+  await expect(form.getByRole('combobox', { name: 'Customer', exact: true }).locator('option:checked')).toContainText(customerName)
+})
+
 test('book, reject an overlap, cancel, and book the released slot', async ({ page, request }) => {
   const token = await login(page)
   const suffix = randomUUID().slice(0, 8)

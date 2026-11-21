@@ -1,4 +1,4 @@
-﻿# Repository workflow
+# Repository workflow
 
 ## Choose the branch for the requested section
 

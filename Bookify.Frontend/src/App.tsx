@@ -810,7 +810,7 @@ function App({ onLogout }: AppProps) {
         </div>
       </header>
 
-      <main className={`main-content${activePage === 'resources' ? ' resources-page' : ''}`}>
+      <main className={`main-content workspace-page ${activePage}-page`}>
         <section className="page-heading">
           <div className="page-heading-left">
             <h1>
@@ -824,7 +824,7 @@ function App({ onLogout }: AppProps) {
               {activePage === 'resources'
                 ? 'Find a space, review capacity, and manage availability'
                 : activePage === 'customers'
-                  ? 'Directory of team members and organizations authorized to reserve spaces'
+                  ? 'Find customers, update contact details, and manage reservations'
                   : 'Create conflict-free reservations and manage live booking statuses'}
             </p>
           </div>
@@ -1237,7 +1237,7 @@ function App({ onLogout }: AppProps) {
                   />
                 </label>
                 <label>
-                  Phone <span className="optional-label">(optional)</span>
+                  <span>Phone <span className="optional-label">(optional)</span></span>
                   <input
                     disabled={isCreatingCustomer}
                     type="tel"
@@ -1281,28 +1281,36 @@ function App({ onLogout }: AppProps) {
                 <div className="empty-state">No matching customers found.</div>
               </div>
             ) : (
-              <div className="booking-table-wrap">
-                <table className="booking-table">
-                  <thead>
-                    <tr>
-                      <th scope="col">Customer</th>
-                      <th scope="col">Email</th>
-                      <th scope="col">Phone</th>
-                      <th scope="col" className="text-right">Actions</th>
+              <div className="booking-table-wrap customer-directory">
+                <table className="booking-table customer-table" role="table" aria-label="Customers list">
+                  <thead role="rowgroup">
+                    <tr role="row">
+                      <th scope="col" role="columnheader">Customer</th>
+                      <th scope="col" role="columnheader">Email</th>
+                      <th scope="col" role="columnheader">Phone</th>
+                      <th scope="col" role="columnheader" className="text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody role="rowgroup">
                     {filteredCustomers.map((customer) => (
-                      <tr key={customer.id}>
-                        <td>
-                          <span className="resource-id">
-                            #{String(customer.id).padStart(2, '0')}
-                          </span>
-                          <span className="resource-name">{customer.name}</span>
+                      <tr key={customer.id} role="row">
+                        <td className="customer-identity-cell" role="cell">
+                          <div className="customer-identity">
+                            <span className="resource-id">
+                              #{String(customer.id).padStart(2, '0')}
+                            </span>
+                            <span className="customer-name">{customer.name}</span>
+                          </div>
                         </td>
-                        <td>{customer.email}</td>
-                        <td className="mono-cell">{customer.phone || '—'}</td>
-                        <td>
+                        <td role="cell">
+                          <span className="customer-cell-label" aria-hidden="true">Email</span>
+                          {customer.email}
+                        </td>
+                        <td className="mono-cell" role="cell">
+                          <span className="customer-cell-label" aria-hidden="true">Phone</span>
+                          {customer.phone || 'Not provided'}
+                        </td>
+                        <td className="customer-actions-cell" role="cell">
                           <div className="booking-actions">
                             <button
                               type="button"
@@ -1336,6 +1344,9 @@ function App({ onLogout }: AppProps) {
                     ))}
                   </tbody>
                 </table>
+                <div className="customer-table-footer" role="status">
+                  Showing {filteredCustomers.length} of {customers.length} customers
+                </div>
               </div>
             )}
           </section>
@@ -1486,6 +1497,7 @@ function App({ onLogout }: AppProps) {
                         key={status}
                         type="button"
                         className={bookingStatusFilter === status ? 'active' : ''}
+                        aria-pressed={bookingStatusFilter === status}
                         onClick={() => setBookingStatusFilter(status)}
                       >
                         {status}
@@ -1604,30 +1616,46 @@ function App({ onLogout }: AppProps) {
                 <div className="empty-state">No bookings match the selected filter.</div>
               </div>
             ) : (
-              <div className="booking-table-wrap">
-                <table className="booking-table">
-                  <thead>
-                    <tr>
-                      <th scope="col">ID</th>
-                      <th scope="col">Resource</th>
-                      <th scope="col">Customer</th>
-                      <th scope="col">Starts</th>
-                      <th scope="col">Ends</th>
-                      <th scope="col">Status</th>
-                      <th scope="col" className="text-right">Actions</th>
+              <div className="booking-table-wrap booking-schedule">
+                <table className="booking-table reservation-table" role="table" aria-label="Bookings list">
+                  <thead role="rowgroup">
+                    <tr role="row">
+                      <th scope="col" role="columnheader">ID</th>
+                      <th scope="col" role="columnheader">Resource</th>
+                      <th scope="col" role="columnheader">Customer</th>
+                      <th scope="col" role="columnheader">Starts</th>
+                      <th scope="col" role="columnheader">Ends</th>
+                      <th scope="col" role="columnheader">Status</th>
+                      <th scope="col" role="columnheader" className="text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody role="rowgroup">
                     {filteredBookings.map((booking) => (
-                      <tr key={booking.id}>
-                        <td className="mono-cell">#{String(booking.id).padStart(2, '0')}</td>
-                        <td className="booking-resource">{booking.resourceName}</td>
-                        <td>{booking.customerName}</td>
-                        <td className="mono-cell">{formatDate(booking.startDate)}</td>
-                        <td className="mono-cell">{formatDate(booking.endDate)}</td>
-                        <td>
-                          <span className="inline-status">
+                      <tr key={booking.id} role="row">
+                        <td className="mono-cell booking-id-cell" role="cell">
+                          <span className="booking-cell-label" aria-hidden="true">Booking</span>
+                          #{String(booking.id).padStart(2, '0')}
+                        </td>
+                        <td className="booking-resource" role="cell">
+                          <span className="booking-cell-label" aria-hidden="true">Resource</span>
+                          {booking.resourceName}
+                        </td>
+                        <td role="cell">
+                          <span className="booking-cell-label" aria-hidden="true">Customer</span>
+                          {booking.customerName}
+                        </td>
+                        <td className="mono-cell" role="cell">
+                          <span className="booking-cell-label" aria-hidden="true">Starts</span>
+                          <time dateTime={booking.startDate}>{formatDate(booking.startDate)}</time>
+                        </td>
+                        <td className="mono-cell" role="cell">
+                          <span className="booking-cell-label" aria-hidden="true">Ends</span>
+                          <time dateTime={booking.endDate}>{formatDate(booking.endDate)}</time>
+                        </td>
+                        <td className="booking-status-cell" role="cell">
+                          <span className={`inline-status booking-status status-${booking.status.toLowerCase()}`}>
                             <span
+                              aria-hidden="true"
                               className={`status-dot ${
                                 booking.status === 'Confirmed'
                                   ? 'dot-emerald'
@@ -1641,7 +1669,7 @@ function App({ onLogout }: AppProps) {
                             <span>{booking.status}</span>
                           </span>
                         </td>
-                        <td>
+                        <td className="booking-actions-cell" role="cell">
                           <div className="booking-actions">
                             {(booking.status === 'Pending' || booking.status === 'Confirmed') && (
                               <button
@@ -1651,7 +1679,7 @@ function App({ onLogout }: AppProps) {
                                 aria-label={`Edit booking ${booking.id}`}
                                 disabled={bookingActionInProgress}
                               >
-                                <Pencil size={12} /> Edit
+                                <Pencil size={12} aria-hidden="true" /> Edit
                               </button>
                             )}
                             {booking.status === 'Pending' && (
@@ -1692,7 +1720,7 @@ function App({ onLogout }: AppProps) {
                               title="Delete booking"
                               disabled={bookingActionInProgress}
                             >
-                              <Trash2 size={14} />
+                              <Trash2 size={14} aria-hidden="true" />
                             </button>
                           </div>
                         </td>
@@ -1700,6 +1728,9 @@ function App({ onLogout }: AppProps) {
                     ))}
                   </tbody>
                 </table>
+                <div className="booking-table-footer" role="status">
+                  Showing {filteredBookings.length} of {bookings.length} bookings
+                </div>
               </div>
             )}
           </section>

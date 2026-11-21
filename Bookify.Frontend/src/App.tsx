@@ -1198,72 +1198,78 @@ function App({ onLogout }: AppProps) {
               </p>
             )}
 
-            {isCustomerFormOpen && (
-              <form
-                id="customer-create-form"
-                className="customer-form"
-                aria-label={editingCustomerId === null ? 'Add customer' : 'Edit customer'}
-                onSubmit={handleSaveCustomer}
-              >
-                {editingCustomerId !== null && <h3 className="directory-form-title">Edit customer</h3>}
-                <label>
-                  Name
-                  <input
-                    ref={customerNameInput}
-                    disabled={isCreatingCustomer}
-                    required
-                    maxLength={100}
-                    autoComplete="name"
-                    value={customerForm.name}
-                    onChange={(event) =>
-                      setCustomerForm((current) => ({ ...current, name: event.target.value }))
-                    }
-                    placeholder="e.g. Alex Morgan"
-                  />
-                </label>
-                <label>
-                  Email
-                  <input
-                    disabled={isCreatingCustomer}
-                    required
-                    type="email"
-                    maxLength={100}
-                    autoComplete="email"
-                    value={customerForm.email}
-                    onChange={(event) =>
-                      setCustomerForm((current) => ({ ...current, email: event.target.value }))
-                    }
-                    placeholder="alex@example.com"
-                  />
-                </label>
-                <label>
-                  <span>Phone <span className="optional-label">(optional)</span></span>
-                  <input
-                    disabled={isCreatingCustomer}
-                    type="tel"
-                    maxLength={20}
-                    autoComplete="tel"
-                    value={customerForm.phone}
-                    onChange={(event) =>
-                      setCustomerForm((current) => ({ ...current, phone: event.target.value }))
-                    }
-                    placeholder="+1 (555) 019-2834"
-                  />
-                </label>
-                <div className="customer-form-footer">
-                  <p className="form-message error-text" role="alert">{customerFormError}</p>
-                  <div className="directory-form-actions">
-                    <button type="button" className="row-btn-secondary" onClick={closeCustomerForm} disabled={isCreatingCustomer}>
-                      Cancel
-                    </button>
-                    <button className="create-button" type="submit" disabled={isCreatingCustomer}>
-                      {editingCustomerId === null ? <Plus size={14} /> : <Check size={14} />}
-                      {isCreatingCustomer ? 'Saving...' : editingCustomerId === null ? 'Save customer' : 'Save changes'}
-                    </button>
+            <div
+              className={`customer-form-reveal${isCustomerFormOpen ? ' is-open' : ''}`}
+              aria-hidden={!isCustomerFormOpen}
+              inert={!isCustomerFormOpen}
+            >
+              <div className="customer-form-reveal-content">
+                <form
+                  id="customer-create-form"
+                  className="customer-form"
+                  aria-label={editingCustomerId === null ? 'Add customer' : 'Edit customer'}
+                  onSubmit={handleSaveCustomer}
+                >
+                  {editingCustomerId !== null && <h3 className="directory-form-title">Edit customer</h3>}
+                  <label>
+                    Name
+                    <input
+                      ref={customerNameInput}
+                      disabled={isCreatingCustomer}
+                      required
+                      maxLength={100}
+                      autoComplete="name"
+                      value={customerForm.name}
+                      onChange={(event) =>
+                        setCustomerForm((current) => ({ ...current, name: event.target.value }))
+                      }
+                      placeholder="e.g. Alex Morgan"
+                    />
+                  </label>
+                  <label>
+                    Email
+                    <input
+                      disabled={isCreatingCustomer}
+                      required
+                      type="email"
+                      maxLength={100}
+                      autoComplete="email"
+                      value={customerForm.email}
+                      onChange={(event) =>
+                        setCustomerForm((current) => ({ ...current, email: event.target.value }))
+                      }
+                      placeholder="alex@example.com"
+                    />
+                  </label>
+                  <label>
+                    <span>Phone <span className="optional-label">(optional)</span></span>
+                    <input
+                      disabled={isCreatingCustomer}
+                      type="tel"
+                      maxLength={20}
+                      autoComplete="tel"
+                      value={customerForm.phone}
+                      onChange={(event) =>
+                        setCustomerForm((current) => ({ ...current, phone: event.target.value }))
+                      }
+                      placeholder="+1 (555) 019-2834"
+                    />
+                  </label>
+                  <div className="customer-form-footer">
+                    <p className="form-message error-text" role="alert">{customerFormError}</p>
+                    <div className="directory-form-actions">
+                      <button type="button" className="row-btn-secondary" onClick={closeCustomerForm} disabled={isCreatingCustomer}>
+                        Cancel
+                      </button>
+                      <button className="create-button" type="submit" disabled={isCreatingCustomer}>
+                        {editingCustomerId === null ? <Plus size={14} /> : <Check size={14} />}
+                        {isCreatingCustomer ? 'Saving...' : editingCustomerId === null ? 'Save customer' : 'Save changes'}
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </form>
-            )}
+                </form>
+              </div>
+            </div>
 
             {areCustomersLoading ? (
               <div className="data-list-container" role="status">
@@ -1296,9 +1302,6 @@ function App({ onLogout }: AppProps) {
                       <tr key={customer.id} role="row">
                         <td className="customer-identity-cell" role="cell">
                           <div className="customer-identity">
-                            <span className="resource-id">
-                              #{String(customer.id).padStart(2, '0')}
-                            </span>
                             <span className="customer-name">{customer.name}</span>
                           </div>
                         </td>
@@ -1344,11 +1347,12 @@ function App({ onLogout }: AppProps) {
                     ))}
                   </tbody>
                 </table>
-                <div className="customer-table-footer" role="status">
-                  Showing {filteredCustomers.length} of {customers.length} customers
-                </div>
               </div>
             )}
+            <span className="sr-only" role="status">
+              {!areCustomersLoading && !customersError &&
+                `Showing ${filteredCustomers.length} of ${customers.length} customers`}
+            </span>
           </section>
         )}
 

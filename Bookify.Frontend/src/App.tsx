@@ -934,82 +934,88 @@ function App({ onLogout }: AppProps) {
               </p>
             )}
 
-            {isResourceFormOpen && (
-              <form
-                id="resource-create-form"
-                className="resource-form"
-                aria-label={editingResourceId === null ? 'Add resource' : 'Edit resource'}
-                onSubmit={handleSaveResource}
-              >
-                {editingResourceId !== null && <h3 className="directory-form-title">Edit resource</h3>}
-                <label>
-                  Room name
-                  <input
-                    ref={resourceNameInput}
-                    disabled={isCreatingResource}
-                    required
-                    maxLength={100}
-                    value={resourceForm.name}
-                    onChange={(event) =>
-                      setResourceForm((current) => ({ ...current, name: event.target.value }))
-                    }
-                    placeholder="e.g. Boardroom A"
-                  />
-                </label>
-                <label>
-                  Description
-                  <input
-                    disabled={isCreatingResource}
-                    maxLength={500}
-                    value={resourceForm.description}
-                    onChange={(event) =>
-                      setResourceForm((current) => ({ ...current, description: event.target.value }))
-                    }
-                    placeholder="AV equipment, seating layout..."
-                  />
-                </label>
-                <label>
-                  Capacity
-                  <input
-                    disabled={isCreatingResource}
-                    required
-                    type="number"
-                    min="1"
-                    max="1000"
-                    value={resourceForm.capacity}
-                    onChange={(event) =>
-                      setResourceForm((current) => ({ ...current, capacity: event.target.value }))
-                    }
-                  />
-                </label>
-                <label className="availability-field">
-                  <input
-                    type="checkbox"
-                    disabled={isCreatingResource}
-                    checked={resourceForm.isAvailable}
-                    onChange={(event) =>
-                      setResourceForm((current) => ({
-                        ...current,
-                        isAvailable: event.target.checked,
-                      }))
-                    }
-                  />
-                  Available for booking
-                </label>
-                <div className="resource-form-footer">
-                  <p className="form-message error-text" role="alert">{resourceFormError}</p>
-                  <div className="directory-form-actions">
-                    <button type="button" className="row-btn-secondary" onClick={closeResourceForm} disabled={isCreatingResource}>
-                      Cancel
-                    </button>
-                    <button className="create-button" type="submit" disabled={isCreatingResource}>
-                      {editingResourceId === null ? <Plus size={14} /> : <Check size={14} />}
-                      {isCreatingResource ? 'Saving...' : editingResourceId === null ? 'Save resource' : 'Save changes'}
-                    </button>
+            <div
+              className={`resource-form-reveal${isResourceFormOpen ? ' is-open' : ''}`}
+              aria-hidden={!isResourceFormOpen}
+              inert={!isResourceFormOpen}
+            >
+              <div className="resource-form-reveal-content">
+                <form
+                  id="resource-create-form"
+                  className="resource-form"
+                  aria-label={editingResourceId === null ? 'Add resource' : 'Edit resource'}
+                  onSubmit={handleSaveResource}
+                >
+                  {editingResourceId !== null && <h3 className="directory-form-title">Edit resource</h3>}
+                  <label>
+                    Room name
+                    <input
+                      ref={resourceNameInput}
+                      disabled={isCreatingResource}
+                      required
+                      maxLength={100}
+                      value={resourceForm.name}
+                      onChange={(event) =>
+                        setResourceForm((current) => ({ ...current, name: event.target.value }))
+                      }
+                      placeholder="e.g. Boardroom A"
+                    />
+                  </label>
+                  <label>
+                    Description
+                    <input
+                      disabled={isCreatingResource}
+                      maxLength={500}
+                      value={resourceForm.description}
+                      onChange={(event) =>
+                        setResourceForm((current) => ({ ...current, description: event.target.value }))
+                      }
+                      placeholder="AV equipment, seating layout..."
+                    />
+                  </label>
+                  <label>
+                    Capacity
+                    <input
+                      disabled={isCreatingResource}
+                      required
+                      type="number"
+                      min="1"
+                      max="1000"
+                      value={resourceForm.capacity}
+                      onChange={(event) =>
+                        setResourceForm((current) => ({ ...current, capacity: event.target.value }))
+                      }
+                    />
+                  </label>
+                  <label className="availability-field">
+                    <input
+                      type="checkbox"
+                      disabled={isCreatingResource}
+                      checked={resourceForm.isAvailable}
+                      onChange={(event) =>
+                        setResourceForm((current) => ({
+                          ...current,
+                          isAvailable: event.target.checked,
+                        }))
+                      }
+                    />
+                    Available for booking
+                  </label>
+                  <div className="resource-form-footer">
+                    <p className="form-message error-text" role="alert">{resourceFormError}</p>
+                    <div className="directory-form-actions">
+                      <button type="button" className="row-btn-secondary" onClick={closeResourceForm} disabled={isCreatingResource}>
+                        Cancel
+                      </button>
+                      <button className="create-button" type="submit" disabled={isCreatingResource}>
+                        {editingResourceId === null ? <Plus size={14} /> : <Check size={14} />}
+                        {isCreatingResource ? 'Saving...' : editingResourceId === null ? 'Save resource' : 'Save changes'}
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </form>
-            )}
+                </form>
+              </div>
+            </div>
 
             {isLoading ? (
               <div className="data-list-container" role="status" aria-label="Loading resources">
@@ -1058,7 +1064,9 @@ function App({ onLogout }: AppProps) {
 
                         <div className="col-capacity" role="cell">
                           <span className="capacity-text">
-                            <Users size={14} aria-hidden="true" />
+                            <span className="capacity-icon" aria-hidden="true">
+                              <Users size={14} />
+                            </span>
                             <span className="capacity-value">{resource.capacity}</span>
                             {' '}
                             <span className="capacity-unit">
@@ -1076,9 +1084,9 @@ function App({ onLogout }: AppProps) {
                               : <Wrench size={12} aria-hidden="true" />}
                             {resource.isAvailable ? 'Available' : 'Maintenance'}
                           </span>
-                          <span className="resource-status-detail">
-                            {resource.isAvailable ? 'Ready for instant booking' : 'Paused for maintenance'}
-                          </span>
+                          {!resource.isAvailable && (
+                            <span className="resource-status-detail">Paused for maintenance</span>
+                          )}
                         </div>
 
                         <div className="col-actions" role="cell">
@@ -1122,12 +1130,9 @@ function App({ onLogout }: AppProps) {
                     ))}
                   </div>
                 </div>
-                <div className="resource-table-footer">
-                  <span className="resource-table-count" role="status">
-                    Showing {filteredResources.length} of {resources.length} resources
-                  </span>
-                  <span>Real-time conflict checking active</span>
-                </div>
+                <span className="sr-only" role="status">
+                  Showing {filteredResources.length} of {resources.length} resources
+                </span>
               </div>
             )}
           </section>

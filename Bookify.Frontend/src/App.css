@@ -388,35 +388,35 @@ select:focus-visible {
 }
 
 /* ==========================================================================
-   D. Resources Page
+   D. Directory Pages
    ========================================================================== */
-.resources-page .page-heading {
+.directory-page .page-heading {
   gap: 20px;
   padding: 32px 0 24px;
   border-bottom: 0;
 }
 
-.resources-page .page-heading h1 {
+.directory-page .page-heading h1 {
   font-size: 28px;
 }
 
-.resources-page .page-description {
+.directory-page .page-description {
   margin-top: 8px;
   font-size: 14px;
   line-height: 1.5;
 }
 
-.resources-page .telemetry-strip {
+.directory-page .telemetry-strip {
   padding: 12px 16px;
   border-radius: 12px;
   line-height: 1.5;
 }
 
-.resources-page .view-panel {
+.directory-page .view-panel {
   padding-top: 0;
 }
 
-.resources-page .control-toolbar {
+.directory-page .control-toolbar {
   gap: 16px;
   margin-bottom: 20px;
   padding: 16px;
@@ -425,18 +425,18 @@ select:focus-visible {
   background: var(--surface);
 }
 
-.resources-page .toolbar-left {
+.directory-page .toolbar-left {
   flex: 1;
   min-width: 0;
   gap: 12px;
 }
 
-.resources-page .search-box {
+.directory-page .search-box {
   flex: 1 1 240px;
   max-width: 320px;
 }
 
-.resources-page .search-box input {
+.directory-page .search-box input {
   width: 100%;
   height: 40px;
   font-size: 13px;
@@ -446,30 +446,33 @@ select:focus-visible {
   height: 36px;
 }
 
-.resources-page .toolbar-right .icon-button {
+.directory-page .toolbar-right .icon-button {
   width: 40px;
   height: 40px;
 }
 
-.resources-page .add-resource-button {
+.directory-page .add-resource-button {
   height: 40px;
   padding: 0 16px;
   font-size: 13px;
 }
 
-.resources-page .data-list-container,
+.directory-page .data-list-container,
 .resources-page .resource-form,
-.resources-page .message {
+.customers-page .customer-form,
+.customers-page .customer-directory,
+.directory-page .message {
   border-radius: 16px;
 }
 
-.resources-page .resource-form {
+.resources-page .resource-form,
+.customers-page .customer-form {
   padding: 24px;
   gap: 16px;
   margin-bottom: 20px;
 }
 
-.resources-page .empty-state {
+.directory-page .empty-state {
   padding: 48px 24px;
   font-size: 14px;
 }
@@ -674,7 +677,8 @@ select:focus-visible {
   color: var(--text-secondary);
 }
 
-.resource-table-footer {
+.resource-table-footer,
+.customer-table-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1052,6 +1056,95 @@ select:focus-visible {
   gap: 6px;
 }
 
+/* Customer directory: a table on desktop and labelled rows on small screens. */
+.customer-directory {
+  position: relative;
+}
+
+.customer-table {
+  table-layout: fixed;
+  white-space: normal;
+}
+
+.customer-table th {
+  padding: 14px 24px;
+}
+
+.customer-table th:nth-child(1) {
+  width: 26%;
+}
+
+.customer-table th:nth-child(2) {
+  width: 30%;
+}
+
+.customer-table th:nth-child(3) {
+  width: 19%;
+}
+
+.customer-table th:nth-child(4) {
+  width: 25%;
+}
+
+.customer-table td {
+  padding: 24px;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.customer-identity {
+  display: flex;
+  align-items: baseline;
+  min-width: 0;
+}
+
+.customer-identity .resource-id {
+  flex-shrink: 0;
+  padding: 2px 6px;
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  background: var(--surface-subtle);
+  font-size: 11px;
+  line-height: 16px;
+}
+
+.customer-name {
+  min-width: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text-primary);
+}
+
+.customer-cell-label {
+  display: none;
+}
+
+.customer-table .mono-cell {
+  font-size: 12px;
+}
+
+.customer-table .booking-actions {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.customer-table .booking-actions button {
+  flex-shrink: 0;
+  height: 36px;
+  white-space: nowrap;
+}
+
+.customers-page .customer-form-footer {
+  flex-wrap: wrap;
+}
+
+.customers-page .form-message {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .booking-edit-heading {
   grid-column: 1 / -1;
   padding: 0 0 4px;
@@ -1188,6 +1281,64 @@ select:disabled {
     padding-top: 12px;
     border-top: 1px solid var(--border-default);
   }
+
+  .customer-table,
+  .customer-table tbody {
+    display: block;
+  }
+
+  .customer-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .customer-table tbody tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    padding: 24px;
+    border-bottom: 1px solid var(--border-default);
+  }
+
+  .customer-table tbody tr:last-child {
+    border-bottom: 0;
+  }
+
+  .customer-table td {
+    display: block;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .customer-identity-cell,
+  .customer-actions-cell {
+    grid-column: 1 / -1;
+  }
+
+  .customer-table td.customer-actions-cell {
+    padding-top: 12px;
+    border-top: 1px solid var(--border-default);
+  }
+
+  .customer-cell-label {
+    display: block;
+    margin-bottom: 4px;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  .customer-table .booking-actions {
+    justify-content: flex-start;
+  }
 }
 
 @media (max-width: 768px) {
@@ -1203,29 +1354,29 @@ select:disabled {
 }
 
 @media (max-width: 600px) {
-  .resources-page .page-heading {
+  .directory-page .page-heading {
     padding-top: 24px;
   }
 
-  .resources-page .page-heading h1 {
+  .directory-page .page-heading h1 {
     font-size: 24px;
   }
 
-  .resources-page .telemetry-strip {
+  .directory-page .telemetry-strip {
     width: 100%;
     gap: 8px 16px;
   }
 
-  .resources-page .telemetry-dot {
+  .directory-page .telemetry-dot {
     display: none;
   }
 
-  .resources-page .toolbar-left,
-  .resources-page .toolbar-right {
+  .directory-page .toolbar-left,
+  .directory-page .toolbar-right {
     flex: 1 1 100%;
   }
 
-  .resources-page .search-box {
+  .directory-page .search-box {
     max-width: none;
   }
 
@@ -1234,7 +1385,7 @@ select:disabled {
     flex-wrap: wrap;
   }
 
-  .resources-page .add-resource-button {
+  .directory-page .add-resource-button {
     flex: 1;
   }
 
@@ -1243,12 +1394,23 @@ select:disabled {
     padding: 16px;
   }
 
-  .resources-page .resource-form-footer {
+  .customers-page .customer-form {
+    padding: 16px;
+  }
+
+  .customer-table tbody tr {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 20px 16px;
+  }
+
+  .resources-page .resource-form-footer,
+  .customers-page .customer-form-footer {
     flex-wrap: wrap;
   }
 
   .resource-grid-row,
-  .resource-table-footer {
+  .resource-table-footer,
+  .customer-table-footer {
     padding: 20px 16px;
   }
 }
